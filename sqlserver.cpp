@@ -15,12 +15,12 @@ int main()
 
     SQLite::Statement query2(*conn1,
         "CREATE TABLE IF NOT EXISTS data ("
-        "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        "id INTEGER,"
         "value TEXT);");
     query2.executeStep();
 
-    SQLite::Statement query1(*conn1, "PRAGMA journal_mode=WAL");
-    query1.executeStep();
+    // SQLite::Statement query1(*conn1, "PRAGMA journal_mode=WAL");
+    // query1.executeStep();
 
     connPool.returnConnection(conn1);
 

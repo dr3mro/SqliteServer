@@ -1,44 +1,54 @@
 import requests
-import threading
+import json
 import random
 import string
+from concurrent.futures import ThreadPoolExecutor
 
-# Target API endpoint
-post_url = 'http://localhost:18080/post'
-
-# Number of requests to send
-num_requests = 100  # Adjust the number as needed
+# Define the base URL and headers
+post_url = "http://localhost:18080/post"
+get_url_template = "http://localhost:18080/get/{}"
+headers = {
+    "Accept": "application/json",
+    "Content-type": "application/json"
+}
 
 # Function to generate a random string
-def generate_random_string(length):
+def generate_random_string(length=8):
     letters = string.ascii_letters
     return ''.join(random.choice(letters) for _ in range(length))
 
-# Function to send POST requests with payload (id and value)
-def send_post_request():
-    try:
-        # Generate random id and value
-        payload = {"id": random.randint(1, 1000), "value": generate_random_string(10)}
-        headers = {"Accept": "application/json", "Content-type": "application/json"}
+def post_request(id, value):
+    data = {
+        "id": id,
+        "value": value
+    }
+    response = requests.post(post_url, headers=headers, data=json.dumps(data))
+    return response.status_code, response.json() if response.status_code == 200 else response.text
 
-        # Send POST request with payload
-        response = requests.post(post_url, headers=headers, json=payload)
+def get_request(id):
+    url = get_url_template.format(id)
+    response = requests.get(url)
+    return response.status_code, response.json() if response.status_code == 200 else response.text
 
-        # Debug print the request details
-        print(f"POST Request URL: {post_url}")
-        print(f"POST Request Payload: {payload}")
-        print(f"POST Request Status Code: {response.status_code}")
-    except requests.exceptions.RequestException as e:
-        print(f"Exception occurred during POST request: {e}")
+def perform_requests(id):
+    # Generate a random value string
+    random_value = generate_random_string()
 
-# Function to execute POST requests sequentially
-def execute_post_requests():
-    print("Executing POST requests sequentially...")
-    for _ in range(num_requests):
-        send_post_request()
-    print("All POST requests sent.")
+    # Perform the POST request
+    post_status, post_response = post_request(id, random_value)
+    print(f"POST ID: {id}, Status: {post_status}, Response: {post_response}")
 
-# Execute POST requests sequentially
-execute_post_requests()
+    # Perform the GET request
+    get_status, get_response = get_request(id)
+    print(f"GET ID: {id}, Status: {get_status}, Response: {get_response}")
 
-print("All operations completed.")
+# Number of threads (corresponding to IDs from 1 to 100)
+num_threads = 4
+
+# Use ThreadPoolExecutor to execute requests in parallel
+with ThreadPoolExecutor(max_workers=num_threads) as executor:
+    futures = [executor.submit(perform_requests, id) for id in range(1, num_threads + 1)]
+
+# Wait for all threads to complete
+for future in futures:
+    future.result()

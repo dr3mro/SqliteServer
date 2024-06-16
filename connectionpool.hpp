@@ -2,6 +2,7 @@
 #define CONNECTION_POOL_H
 
 #include <SQLiteCpp/SQLiteCpp.h>
+#include <iostream>
 #include <memory>
 #include <mutex>
 #include <queue>

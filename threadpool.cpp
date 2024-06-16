@@ -26,6 +26,7 @@ ThreadPool::ThreadPool(size_t threads)
 
 ThreadPool::~ThreadPool()
 {
+    std::cout << "Threads:" << workers.size() << std::endl;
     {
         std::unique_lock<std::mutex> lock(queue_mutex);
         stop = true;

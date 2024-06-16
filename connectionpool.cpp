@@ -13,6 +13,7 @@ void ConnectionPool::returnConnection(std::shared_ptr<SQLite::Database> conn)
 
 ConnectionPool::~ConnectionPool()
 {
+    std::cout << "Connections:" << pool.size() << std::endl;
     while (!pool.empty()) {
         auto c = pool.front();
         pool.pop();
