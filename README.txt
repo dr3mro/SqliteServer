@@ -11,3 +11,9 @@ Build the Docker image:
 Run the Docker container:
 
     docker run sqlserver
+
+Get docker ID
+    docker ps
+
+Get docker IPAddress
+    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' e584361f0545
