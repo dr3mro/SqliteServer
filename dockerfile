@@ -27,4 +27,4 @@ RUN cmake -S. -Bbuild -G Ninja
 RUN cmake --build build
 
 # Run the binary
-CMD [ "python3", "print_ip.py", "&&", "./build/sqlserver"]
+CMD python3 print_ip.py && ./build/sqlserver
