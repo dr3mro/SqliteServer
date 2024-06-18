@@ -17,3 +17,9 @@ Get docker ID
 
 Get docker IPAddress
     docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' e584361f0545
+    
+    
+    
+    docker pull postgres
+    docker volume create postgres_data
+    docker run --name postgres_container -e POSTGRES_PASSWORD=000 -d -p 5432:5432 -v postgres_data:/var/lib/postgresql/data postgres
