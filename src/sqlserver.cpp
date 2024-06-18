@@ -4,6 +4,8 @@
 #include <crow.h>
 #include <thread>
 
+#include "database.hpp"
+
 const int MAX_RETRIES = 10;
 const int RETRY_DELAY_MS = 10000;
 
@@ -26,6 +28,9 @@ auto executeWithRetry(Func func) -> decltype(func())
 
 int main()
 {
+
+    Database pqdb("host = 172.17.0.2 dbname = postgres user = postgres password = 000");
+
     crow::SimpleApp app;
 
     ThreadPool threadPool(128);

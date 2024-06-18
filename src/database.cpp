@@ -7,6 +7,11 @@ Database::Database(const std::string& connection_str)
         conn = new pqxx::connection(connection_str);
         if (conn->is_open()) {
             std::cout << "Opened database successfully: " << conn->dbname() << std::endl;
+            // SQL command to create a table
+            std::string sql = "CREATE TABLE IF NOT EXISTS data ("
+                              "id SERIAL PRIMARY KEY, "
+                              "value TEXT NOT NULL);";
+            this->executeQuery(sql);
         } else {
             std::cout << "Failed to open database" << std::endl;
         }
@@ -17,7 +22,6 @@ Database::Database(const std::string& connection_str)
 
 Database::~Database()
 {
-    // conn->disconnect();
     delete conn;
 }
 
