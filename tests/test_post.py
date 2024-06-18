@@ -4,6 +4,8 @@ import random
 import string
 from concurrent.futures import ThreadPoolExecutor
 
+hostname="localhost"
+
 # Function to generate a random string of 100 characters
 def generate_random_string(length=100):
     letters = string.ascii_letters + string.digits
@@ -11,7 +13,7 @@ def generate_random_string(length=100):
 
 # Function to send a POST request
 def send_post_request(id):
-    url = "http://localhost:18080/post"
+    url = "http://" + hostname + ":18080/post"
     headers = {
         "Accept": "application/json",
         "Content-type": "application/json"
@@ -25,7 +27,7 @@ def send_post_request(id):
 
 # Function to send a GET request
 def send_get_request(id):
-    url = f"http://localhost:18080/get/{id}"
+    url = "http://" + hostname + f":18080/get/{id}"
     headers = {
         "Accept": "application/json"
     }
