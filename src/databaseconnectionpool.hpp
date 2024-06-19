@@ -14,8 +14,7 @@ public:
 
 private:
     size_t pool_size;
-    std::queue<std::shared_ptr<Database>> connections;
-    std::vector<std::shared_ptr<Database>> available_connections;
+    std::queue<std::shared_ptr<Database>> databaseConnections;
     std::mutex mutex;
     std::condition_variable cv;
 };

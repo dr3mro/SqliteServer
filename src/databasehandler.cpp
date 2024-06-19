@@ -1,5 +1,7 @@
 #include "databasehandler.hpp"
 
+#include <iostream>
+
 DatabaseHandler::DatabaseHandler(DatabaseConnectionPool& dbConnPool)
     : databaseConnectionPool(dbConnPool)
 {
