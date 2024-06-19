@@ -32,8 +32,8 @@ int main()
 {
     try {
         // Initialize thread pool and database connection pool
-        ThreadPool threadPool(256);
-        DatabaseConnectionPool dbConnPool(256);
+        ThreadPool threadPool(2);
+        DatabaseConnectionPool dbConnPool(4);
         DatabaseHandler dbHandler(dbConnPool);
 
         // Create REST handler
