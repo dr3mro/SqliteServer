@@ -1,7 +1,6 @@
 #include "resthandler.hpp"
 #include <crow.h>
 #include <fmt/core.h> // Include fmt library for string formatting
-#include <iomanip> // for std::quoted
 
 RestHandler::RestHandler(DatabaseHandler& dbHandler, ThreadPool& threadPool)
     : dbHandler(dbHandler)
