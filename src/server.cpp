@@ -8,26 +8,6 @@
 #include "databasehandler.hpp"
 #include "resthandler.hpp"
 
-const int MAX_RETRIES = 10;
-const int RETRY_DELAY_MS = 10000;
-
-template <typename Func>
-auto executeWithRetry(Func func) -> decltype(func())
-{
-    int attempts = 0;
-    while (attempts < MAX_RETRIES) {
-        try {
-            return func();
-        } catch (const std::exception& e) {
-            if (++attempts >= MAX_RETRIES) {
-                throw;
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(RETRY_DELAY_MS));
-        }
-    }
-    throw std::runtime_error("Max retries reached");
-}
-
 int main()
 {
     try {
