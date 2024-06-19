@@ -1,23 +1,21 @@
-#ifndef CONNECTION_POOL_H
-#define CONNECTION_POOL_H
-
-#include <SQLiteCpp/SQLiteCpp.h>
-#include <iostream>
+#pragma once
+#include <condition_variable>
 #include <memory>
 #include <mutex>
 #include <queue>
 
+#include "database.hpp"
+
 class ConnectionPool {
 public:
-    ConnectionPool(const std::string& dbFile, size_t poolSize);
-    void returnConnection(std::shared_ptr<SQLite::Database> conn);
-    ~ConnectionPool();
-
-    std::shared_ptr<SQLite::Database> getConnection();
+    ConnectionPool(size_t pool_size);
+    std::shared_ptr<Database> get_connection();
+    void return_connection(std::shared_ptr<Database> db);
 
 private:
-    std::queue<std::shared_ptr<SQLite::Database>> pool;
-    std::mutex pool_mutex;
+    size_t pool_size;
+    std::queue<std::shared_ptr<Database>> connections;
+    std::vector<std::shared_ptr<Database>> available_connections;
+    std::mutex mutex;
+    std::condition_variable cv;
 };
-
-#endif // CONNECTION_POOL_H

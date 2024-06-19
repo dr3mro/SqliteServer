@@ -1,54 +1,44 @@
 #include "connectionpool.hpp"
+#include <iostream>
 
-ConnectionPool::ConnectionPool(const std::string& dbFile, size_t poolSize)
+// Define constants for database connection
+const char* DB_HOST = "172.17.0.3";
+const char* DB_NAME = "postgres";
+const char* DB_USER = "postgres";
+const char* DB_PASSWORD = "000";
+
+ConnectionPool::ConnectionPool(size_t pool_size)
+    : pool_size(pool_size)
+    , available_connections(pool_size)
 {
-    try {
-        for (size_t i = 0; i < poolSize; ++i) {
-            auto connection = std::make_shared<SQLite::Database>(dbFile, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
-            SQLite::Statement query1(*connection, "PRAGMA journal_mode=WAL");
-            query1.executeStep(); // Ensure the statement is executed
-            SQLite::Statement query2(*connection, "pragma synchronous = off;");
-            query2.executeStep(); // Ensure the statement is executed
-            SQLite::Statement query3(*connection, "pragma temp_store = memory;");
-            query3.executeStep(); // Ensure the statement is executed
-            SQLite::Statement query4(*connection, "pragma mmap_size = 60000000000;");
-            query4.executeStep(); // Ensure the statement is executed
-            SQLite::Statement query5(*connection, "pragma page_size = 64000;");
-            query5.executeStep(); // Ensure the statement is executed
-            SQLite::Statement query6(*connection, "pragma busy_timeout = 10000;");
-            query6.executeStep(); // Ensure the statement is executed
-            pool.push(connection);
+    for (size_t i = 0; i < pool_size; ++i) {
+        auto conn = std::make_shared<pqxx::connection>(
+            "host=" + std::string(DB_HOST) + " dbname=" + std::string(DB_NAME) + " user=" + std::string(DB_USER) + " password=" + std::string(DB_PASSWORD));
+        if (conn->is_open()) {
+            auto database = std::make_shared<Database>(conn);
+            connections.push(database);
+        } else {
+            std::cerr << "Failed to open database connection" << std::endl;
         }
-    } catch (const std::exception& e) {
-        std::cerr << "Error initializing connection pool: " << e.what() << std::endl;
-        // Handle cleanup if necessary
-        throw;
     }
 }
 
-void ConnectionPool::returnConnection(std::shared_ptr<SQLite::Database> conn)
+// Get a connection from the pool
+std::shared_ptr<Database> ConnectionPool::get_connection()
 {
-    std::unique_lock<std::mutex> lock(pool_mutex);
-    pool.push(conn);
+    std::unique_lock<std::mutex> lock(mutex);
+    while (connections.empty()) {
+        cv.wait(lock);
+    }
+    auto db = connections.front();
+    connections.pop();
+    return db;
 }
 
-ConnectionPool::~ConnectionPool()
+// Return a connection to the pool
+void ConnectionPool::return_connection(std::shared_ptr<Database> db)
 {
-    std::cout << "Connections: " << pool.size() << std::endl;
-    while (!pool.empty()) {
-        auto c = pool.front();
-        pool.pop();
-        // Ensure proper cleanup if necessary
-    }
-}
-
-std::shared_ptr<SQLite::Database> ConnectionPool::getConnection()
-{
-    std::unique_lock<std::mutex> lock(pool_mutex);
-    if (pool.empty()) {
-        throw std::runtime_error("No available connections.");
-    }
-    auto conn = pool.front();
-    pool.pop();
-    return conn;
+    std::lock_guard<std::mutex> lock(mutex);
+    connections.push(db);
+    cv.notify_one();
 }

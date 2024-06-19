@@ -5,13 +5,14 @@
 
 class Database {
 public:
-    Database(const std::string& connection_str);
-    ~Database();
+    Database(std::shared_ptr<pqxx::connection> conn);
+    ~Database() = default;
 
+    bool isConnected();
     void executeQuery(const std::string& query);
 
 private:
-    pqxx::connection* conn;
+    std::shared_ptr<pqxx::connection> connection;
 };
 
 #endif // DATABASE_HPP

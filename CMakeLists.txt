@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
-project(sqlserver)
+
+set(Target "server")
+project(server)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -9,18 +11,17 @@ include(CPM)
 
 CPMAddPackage("gh:chriskohlhoff/asio#asio-1-30-2")
 CPMAddPackage("gh:CrowCpp/crow#v1.2.0")
-CPMAddPackage("gh:SRombauts/SQLiteCpp#3.3.1")
 CPMAddPackage("gh:jtv/libpqxx#7.9.1")
 
 file (GLOB_RECURSE SRC "src/*.cpp" )
 
 #find_package(PostgreSQL REQUIRED)
 
-add_executable(sqlserver ${SRC})
+add_executable(${Target} ${SRC})
 # Include directories
-target_include_directories(sqlserver PRIVATE "${crow_SOURCE_DIR}/include" "${asio_SOURCE_DIR}/asio/include" "${libpqxx_SOURCE_DIR}/include") #"${PostgreSQL_INCLUDE_DIRS}") #
+target_include_directories(${Target}  PRIVATE "${crow_SOURCE_DIR}/include" "${asio_SOURCE_DIR}/asio/include" "${libpqxx_SOURCE_DIR}/include")
 
-target_link_libraries(sqlserver PRIVATE SQLiteCpp pqxx ${PostgreSQL_LIBRARIES})
+target_link_libraries(${Target}  PRIVATE  pqxx ${PostgreSQL_LIBRARIES})
 
 
 
