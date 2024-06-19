@@ -50,7 +50,7 @@ void RestHandler::handle_post(const crow::request& req, crow::response& res)
             }
 
             // Construct SQL query using {fmt} for parameterized query
-            std::string query = fmt::format("INSERT INTO data (id, value) VALUES ({}, {})",
+            std::string query = fmt::format("INSERT INTO data (id, value) VALUES ({}, '{}')",
                 id, value);
 
             // Execute the query using DatabaseHandler
