@@ -37,21 +37,21 @@ int main()
         DatabaseHandler dbHandler(dbConnPool);
 
         // Create REST handler
-        auto restHandler = std::make_shared<RestHandler>(dbHandler, threadPool);
+        RestHandler restHandler(dbHandler, threadPool);
 
         // Initialize Crow application
         crow::SimpleApp app;
 
         // GET route example: /get/<int>
         CROW_ROUTE(app, "/get/<int>")
-            .methods("GET"_method)([restHandler](const crow::request& req, crow::response& res, int id) {
-                restHandler->handle_get(req, res, id);
+            .methods("GET"_method)([&restHandler](const crow::request& req, crow::response& res, int id) {
+                restHandler.handle_get(req, res, id);
             });
 
         CROW_ROUTE(app, "/post")
             .name("post")
-            .methods("POST"_method)([restHandler](const crow::request& req, crow::response& res) {
-                restHandler->handle_post(req, res);
+            .methods("POST"_method)([&restHandler](const crow::request& req, crow::response& res) {
+                restHandler.handle_post(req, res);
             });
 
         // Start the server on port 8080
