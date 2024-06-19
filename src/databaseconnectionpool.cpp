@@ -1,4 +1,4 @@
-#include "connectionpool.hpp"
+#include "databaseconnectionpool.hpp"
 #include <iostream>
 
 // Define constants for database connection
@@ -7,7 +7,7 @@ const char* DB_NAME = "postgres";
 const char* DB_USER = "postgres";
 const char* DB_PASSWORD = "000";
 
-ConnectionPool::ConnectionPool(size_t pool_size)
+DatabaseConnectionPool::DatabaseConnectionPool(size_t pool_size)
     : pool_size(pool_size)
     , available_connections(pool_size)
 {
@@ -24,7 +24,7 @@ ConnectionPool::ConnectionPool(size_t pool_size)
 }
 
 // Get a connection from the pool
-std::shared_ptr<Database> ConnectionPool::get_connection()
+std::shared_ptr<Database> DatabaseConnectionPool::get_connection()
 {
     std::unique_lock<std::mutex> lock(mutex);
     while (connections.empty()) {
@@ -36,7 +36,7 @@ std::shared_ptr<Database> ConnectionPool::get_connection()
 }
 
 // Return a connection to the pool
-void ConnectionPool::return_connection(std::shared_ptr<Database> db)
+void DatabaseConnectionPool::return_connection(std::shared_ptr<Database> db)
 {
     std::lock_guard<std::mutex> lock(mutex);
     connections.push(db);

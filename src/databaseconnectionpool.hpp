@@ -6,9 +6,9 @@
 
 #include "database.hpp"
 
-class ConnectionPool {
+class DatabaseConnectionPool {
 public:
-    ConnectionPool(size_t pool_size);
+    DatabaseConnectionPool(size_t pool_size);
     std::shared_ptr<Database> get_connection();
     void return_connection(std::shared_ptr<Database> db);
 

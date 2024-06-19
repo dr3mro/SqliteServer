@@ -1,4 +1,4 @@
-#include "connectionpool.hpp"
+#include "databaseconnectionpool.hpp"
 #include "threadpool.hpp"
 #include <chrono>
 #include <crow.h>
@@ -29,10 +29,10 @@ auto executeWithRetry(Func func) -> decltype(func())
 int main()
 {
 
-    ThreadPool threadPool(128);
-    ConnectionPool connPool(128);
+    ThreadPool threadPool(256);
+    DatabaseConnectionPool dbConnPool(256);
 
-    RestHandler rest_handler(connPool);
+    RestHandler rest_handler(dbConnPool);
 
     crow::SimpleApp app;
 

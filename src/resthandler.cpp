@@ -1,14 +1,14 @@
 #include "resthandler.hpp"
 
-RestHandler::RestHandler(ConnectionPool& pool)
-    : connection_pool(pool)
+RestHandler::RestHandler(DatabaseConnectionPool& dbConnPool)
+    : database_connection_pool(dbConnPool)
 {
 }
 
 void RestHandler::handle_get(const crow::request& req, crow::response& res)
 {
     // Retrieve a connection from the pool
-    auto db = connection_pool.get_connection();
+    auto db = database_connection_pool.get_connection();
 
     try {
         // Execute SQL query
@@ -27,14 +27,14 @@ void RestHandler::handle_get(const crow::request& req, crow::response& res)
     }
 
     // Return the connection to the pool
-    connection_pool.return_connection(db);
+    database_connection_pool.return_connection(db);
     res.end();
 }
 
 void RestHandler::handle_post(const crow::request& req, crow::response& res)
 {
     // Retrieve a connection from the pool
-    auto db = connection_pool.get_connection();
+    auto db = database_connection_pool.get_connection();
 
     try {
         // Extract data from request
@@ -55,6 +55,6 @@ void RestHandler::handle_post(const crow::request& req, crow::response& res)
     }
 
     // Return the connection to the pool
-    connection_pool.return_connection(db);
+    database_connection_pool.return_connection(db);
     res.end();
 }
