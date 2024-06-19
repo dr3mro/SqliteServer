@@ -8,7 +8,7 @@ export let options = {
 
 
 export default function () {
-  let res = http.get('http://localhost:18080/get');
+  let res = http.get('http://localhost:8080/get');
   check(res, {
     'status is 200': (r) => r.status === 200,
   });
