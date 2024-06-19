@@ -2,7 +2,7 @@
 #include <iostream>
 
 // Define constants for database connection
-const char* DB_HOST = "172.17.0.3";
+const char* DB_HOST = "172.17.0.2";
 const char* DB_NAME = "postgres";
 const char* DB_USER = "postgres";
 const char* DB_PASSWORD = "000";

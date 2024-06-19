@@ -4,6 +4,7 @@
 #include <crow.h>
 #include <thread>
 
+#include "databasehandler.hpp"
 #include "resthandler.hpp"
 
 const int MAX_RETRIES = 10;
@@ -29,20 +30,19 @@ auto executeWithRetry(Func func) -> decltype(func())
 int main()
 {
 
-    ThreadPool threadPool(256);
-    DatabaseConnectionPool dbConnPool(256);
+    ThreadPool threadPool(4);
+    DatabaseConnectionPool dbConnPool(4);
+    DatabaseHandler dbHandler(dbConnPool);
 
-    RestHandler rest_handler(dbConnPool);
+    RestHandler rest_handler(dbHandler, threadPool);
 
     crow::SimpleApp app;
 
     // Define routes
-    CROW_ROUTE(app, "/get")
-        .name("get")
-        .methods("GET"_method)([&](const crow::request& req, crow::response& res) {
-            rest_handler.handle_get(req, res);
+    CROW_ROUTE(app, "/get/<int>")
+        .methods("GET"_method)([&](const crow::request& req, crow::response& res, int id) {
+            rest_handler.handle_get(req, res, id);
         });
-
     CROW_ROUTE(app, "/post")
         .name("post")
         .methods("POST"_method)([&](const crow::request& req, crow::response& res) {

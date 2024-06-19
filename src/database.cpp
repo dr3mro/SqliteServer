@@ -20,14 +20,26 @@ bool Database::isConnected()
     return connection->is_open();
 }
 
-void Database::executeQuery(const std::string& query)
+json Database::executeQuery(const std::string& query)
 {
-    try {
-        pqxx::work W(*connection);
-        W.exec(query);
-        W.commit();
-        std::cout << "Query executed successfully" << std::endl;
-    } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
+    pqxx::work txn(*connection);
+
+    pqxx::result res = txn.exec(query);
+    json results = json::array();
+
+    for (const auto& row : res) {
+        json jsonRow;
+        for (const auto& field : row) {
+            jsonRow[field.name()] = field.as<std::string>();
+        }
+        results.push_back(jsonRow);
     }
+    return results;
+}
+
+void Database::executeNonQuery(const std::string& query)
+{
+    pqxx::work txn(*connection);
+    txn.exec(query);
+    txn.commit();
 }

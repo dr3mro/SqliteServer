@@ -1,7 +1,10 @@
 #ifndef DATABASE_HPP
 #define DATABASE_HPP
 
+#include <nlohmann/json.hpp>
 #include <pqxx/pqxx> // Include the libpqxx header for PostgreSQL
+
+using json = nlohmann::json;
 
 class Database {
 public:
@@ -9,10 +12,12 @@ public:
     ~Database() = default;
 
     bool isConnected();
-    void executeQuery(const std::string& query);
+    json executeQuery(const std::string& query);
+    void executeNonQuery(const std::string& query);
 
 private:
-    std::shared_ptr<pqxx::connection> connection;
+    std::shared_ptr<pqxx::connection>
+        connection;
 };
 
 #endif // DATABASE_HPP
