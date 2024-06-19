@@ -2,16 +2,12 @@
 #include <iostream>
 
 Database::Database(std::shared_ptr<pqxx::connection> conn)
-    : connection(conn.get())
+    : connection(conn)
 {
-    try {
-        if (conn->is_open()) {
-            std::cout << "Opened database successfully: " << conn->dbname() << std::endl;
-        } else {
-            std::cout << "Failed to open database" << std::endl;
-        }
-    } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
+    if (connection->is_open()) {
+        std::cout << "Opened database successfully: " << conn->dbname() << std::endl;
+    } else {
+        std::cerr << "Failed to open database" << std::endl;
     }
 }
 
@@ -22,24 +18,34 @@ bool Database::isConnected()
 
 json Database::executeQuery(const std::string& query)
 {
-    pqxx::work txn(*connection);
+    try {
+        pqxx::work txn(*connection);
+        pqxx::result res = txn.exec(query);
+        json results = json::array();
 
-    pqxx::result res = txn.exec(query);
-    json results = json::array();
-
-    for (const auto& row : res) {
-        json jsonRow;
-        for (const auto& field : row) {
-            jsonRow[field.name()] = field.as<std::string>();
+        for (const auto& row : res) {
+            json jsonRow;
+            for (const auto& field : row) {
+                jsonRow[field.name()] = field.as<std::string>();
+            }
+            results.push_back(jsonRow);
         }
-        results.push_back(jsonRow);
+
+        return results;
+    } catch (const std::exception& e) {
+        std::cerr << "Error executing query: " << e.what() << std::endl;
+        throw; // Rethrow the exception to indicate failure
     }
-    return results;
 }
 
 void Database::executeNonQuery(const std::string& query)
 {
-    pqxx::work txn(*connection);
-    txn.exec(query);
-    txn.commit();
+    try {
+        pqxx::work txn(*connection);
+        txn.exec(query);
+        txn.commit();
+    } catch (const std::exception& e) {
+        std::cerr << "Error executing non-query: " << e.what() << std::endl;
+        throw; // Rethrow the exception to indicate failure
+    }
 }

@@ -16,8 +16,7 @@ public:
     void executeNonQuery(const std::string& query);
 
 private:
-    std::shared_ptr<pqxx::connection>
-        connection;
+    std::shared_ptr<pqxx::connection> connection;
 };
 
 #endif // DATABASE_HPP

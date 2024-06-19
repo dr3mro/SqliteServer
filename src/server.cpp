@@ -2,6 +2,7 @@
 #include "threadpool.hpp"
 #include <chrono>
 #include <crow.h>
+#include <memory.h>
 #include <thread>
 
 #include "databasehandler.hpp"
@@ -29,28 +30,36 @@ auto executeWithRetry(Func func) -> decltype(func())
 
 int main()
 {
+    try {
+        // Initialize thread pool and database connection pool
+        ThreadPool threadPool(4);
+        DatabaseConnectionPool dbConnPool(4);
+        DatabaseHandler dbHandler(dbConnPool);
 
-    ThreadPool threadPool(4);
-    DatabaseConnectionPool dbConnPool(4);
-    DatabaseHandler dbHandler(dbConnPool);
+        // Create REST handler
+        auto restHandler = std::make_shared<RestHandler>(dbHandler, threadPool);
 
-    RestHandler rest_handler(dbHandler, threadPool);
+        // Initialize Crow application
+        crow::SimpleApp app;
 
-    crow::SimpleApp app;
+        // GET route example: /get/<int>
+        CROW_ROUTE(app, "/get/<int>")
+            .methods("GET"_method)([restHandler](const crow::request& req, crow::response& res, int id) {
+                restHandler->handle_get(req, res, id);
+            });
 
-    // Define routes
-    CROW_ROUTE(app, "/get/<int>")
-        .methods("GET"_method)([&](const crow::request& req, crow::response& res, int id) {
-            rest_handler.handle_get(req, res, id);
-        });
-    CROW_ROUTE(app, "/post")
-        .name("post")
-        .methods("POST"_method)([&](const crow::request& req, crow::response& res) {
-            rest_handler.handle_post(req, res);
-        });
+        CROW_ROUTE(app, "/post")
+            .name("post")
+            .methods("POST"_method)([restHandler](const crow::request& req, crow::response& res) {
+                restHandler->handle_post(req, res);
+            });
 
-    // Start the server on port 8080
-    app.port(8080).multithreaded().run();
+        // Start the server on port 8080
+        app.port(8080).multithreaded().run();
+    } catch (const std::exception& e) {
+        std::cerr << "Exception caught in main: " << e.what() << std::endl;
+        return 1; // Exit with error code
+    }
 
     return 0;
 }

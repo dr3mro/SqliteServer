@@ -31,7 +31,7 @@ target_include_directories(${Target}
                         "${libpqxx_SOURCE_DIR}/include"
                         )
 
-target_link_libraries(${Target}  PRIVATE  pqxx ${PostgreSQL_LIBRARIES})
+target_link_libraries(${Target}  PRIVATE  fmt pqxx ${PostgreSQL_LIBRARIES})
 
 
 
