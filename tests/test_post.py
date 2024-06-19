@@ -13,7 +13,7 @@ def generate_random_string(length=100):
 
 # Function to send a POST request
 def send_post_request(id):
-    url = "http://" + hostname + ":18080/post"
+    url = "http://" + hostname + ":8080/post"
     headers = {
         "Accept": "application/json",
         "Content-type": "application/json"
@@ -27,7 +27,7 @@ def send_post_request(id):
 
 # Function to send a GET request
 def send_get_request(id):
-    url = "http://" + hostname + f":18080/get/{id}"
+    url = "http://" + hostname + f":8080/get/{id}"
     headers = {
         "Accept": "application/json"
     }

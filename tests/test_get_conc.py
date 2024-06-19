@@ -3,7 +3,7 @@ import requests
 import time
 
 # Define the base URL of the API
-base_url = "http://localhost:18080/get/"
+base_url = "http://localhost:8080/get/"
 
 # Function to send a GET request to a specific endpoint
 def send_request(endpoint):
