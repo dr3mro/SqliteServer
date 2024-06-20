@@ -16,7 +16,7 @@ CPMAddPackage("gh:nlohmann/json#v3.11.3")
 CPMAddPackage("gh:fmtlib/fmt#10.2.1")
 CPMAddPackage("gh:chriskohlhoff/asio#asio-1-30-2")
 CPMAddPackage("gh:CrowCpp/crow#v1.2.0")
-CPMAddPackage("https://github.com/postgres/postgres/archive/refs/tags/REL_16_3.tar.gz")
+CPMAddPackage("gh:postgres/postgres#REL_16_3")
 CPMAddPackage("gh:jtv/libpqxx#7.9.1")
 
 file (GLOB_RECURSE SRC "src/*.cpp" )
@@ -29,7 +29,7 @@ target_include_directories(${Target}
                         "${fmt_SOURCE_DIR}/include"
                         "${crow_SOURCE_DIR}/include"
                         "${asio_SOURCE_DIR}/asio/include"
-                        "$(libpq_SOURCE_DIR}/src/interfaces/libpq)"
+                        "$(postgres_SOURCE_DIR}/src/interfaces/libpq)"
                         "${libpqxx_SOURCE_DIR}/include"
                         )
 
