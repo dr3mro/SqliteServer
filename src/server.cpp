@@ -11,9 +11,13 @@
 int main()
 {
     try {
+
+        unsigned int ncpus = std::thread::hardware_concurrency() ? std::thread::hardware_concurrency() : 1;
+
         // Initialize thread pool and database connection pool
-        ThreadPool threadPool(64);
-        DatabaseConnectionPool dbConnPool(32);
+        ThreadPool threadPool(ncpus);
+        DatabaseConnectionPool dbConnPool(ncpus);
+
         DatabaseHandler dbHandler(dbConnPool);
 
         // Create REST handler
