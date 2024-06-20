@@ -1,3 +1,11 @@
+==================================================================================
+
+docker network create valhalla-network
+docker-compose up --build
+
+
+===================================================================================
+
 curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"id":1,"value":"Mohamed Ali"}' http://localhost:8080/post
 
 

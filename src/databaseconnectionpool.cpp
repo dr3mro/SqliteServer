@@ -3,10 +3,10 @@
 #include <pqxx/pqxx> // Assuming pqxx library is used
 
 // Define constants for database connection
-const char* DB_HOST = "172.17.0.2";
+const char* DB_HOST = "172.20.0.3";
 const char* DB_NAME = "postgres";
 const char* DB_USER = "postgres";
-const char* DB_PASSWORD = "000";
+const char* DB_PASSWORD = "postgres";
 
 DatabaseConnectionPool::DatabaseConnectionPool(size_t pool_size)
     : pool_size(pool_size)

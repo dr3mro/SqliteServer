@@ -1,0 +1,39 @@
+# docker-compose.yml
+
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    networks:
+      valhalla-network:
+        ipv4_address: 172.20.0.2
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.pq
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      valhalla-network:
+        ipv4_address: 172.20.0.3
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+networks:
+  valhalla-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  db-data:
