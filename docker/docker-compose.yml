@@ -6,10 +6,12 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile.api
+      dockerfile: dockerfile.api
     networks:
       valhalla-network:
         ipv4_address: 172.20.0.2
+    volumes:
+      - projectvalhalla_data:/usr/src/ProjectValhalla
     depends_on:
       - db
     environment:
@@ -18,7 +20,7 @@ services:
   db:
     build:
       context: .
-      dockerfile: Dockerfile.pq
+      dockerfile: dockerfile.pq
     volumes:
       - db-data:/var/lib/postgresql/data
     networks:
@@ -37,3 +39,4 @@ networks:
 
 volumes:
   db-data:
+  projectvalhalla_data:
