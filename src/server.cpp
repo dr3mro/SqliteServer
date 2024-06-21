@@ -31,7 +31,7 @@ int main()
                 restHandler.handle_get(req, res, id);
             });
 
-        CROW_ROUTE(app, "/api_v1/create_patient/")
+        CROW_ROUTE(app, "/api_v1/create_patient")
             .name("create_patient")
             .methods("POST"_method)([&restHandler](const crow::request& req, crow::response& res) {
                 restHandler.handle_create_client_personal_history(req, res);
