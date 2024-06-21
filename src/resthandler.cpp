@@ -64,9 +64,9 @@ void RestHandler::handle_create_client_personal_history(const crow::request& req
 
         auto jsonData = json::parse(req.body);
 
-        uint64_t id = jsonData["id"];
-        std::string name = jsonData["name"];
-        std::string phone = jsonData["phone"];
+        uint64_t id = jsonData["id"].get<uint64_t>();
+        std::string_view name = jsonData["name"].get<std::string_view>();
+        std::string_view phone = jsonData["phone"].get<std::string_view>();
 
         // Validate input (optional)
         if (id != 0 || name.empty() || phone.empty()) {
