@@ -73,7 +73,6 @@ void RestHandler::handle_create_client_personal_history(const crow::request& req
             response_json_object["msg"] = "Bad Request: id, name or phone must be provided.";
 
             res.write(response_json_object.dump());
-            res.end();
             return;
         }
 
@@ -90,7 +89,6 @@ void RestHandler::handle_create_client_personal_history(const crow::request& req
             response_json_object["msg"] = "Inserted successfully.";
 
             res.write(response_json_object.dump());
-            res.end();
             return;
         } catch (const std::exception& e) {
             // Handle exception (log, etc.)
