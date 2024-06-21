@@ -1,6 +1,5 @@
 #include "databaseconnectionpool.hpp"
 #include "threadpool.hpp"
-#include <chrono>
 #include <crow.h>
 #include <memory.h>
 #include <thread>
@@ -15,8 +14,8 @@ int main()
         unsigned int ncpus = std::thread::hardware_concurrency() ? std::thread::hardware_concurrency() : 1;
 
         // Initialize thread pool and database connection pool
-        ThreadPool threadPool(ncpus);
-        DatabaseConnectionPool dbConnPool(ncpus);
+        ThreadPool threadPool(ncpus * 1.5);
+        DatabaseConnectionPool dbConnPool(ncpus * 2);
 
         DatabaseHandler dbHandler(dbConnPool);
 
