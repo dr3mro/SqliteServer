@@ -69,11 +69,9 @@ void RestHandler::handle_create_client_personal_history(const crow::request& req
 
         // Validate input (optional)
         if (id != 0 || name.empty() || phone.empty()) {
-            res.code = 400;
-
             response_json["id"] = -1;
             response_json["msg"] = "Bad Request: id, name or phone must be provided.";
-
+            res.code = 400;
             res.write(response_json.dump());
             return;
         }
@@ -82,21 +80,20 @@ void RestHandler::handle_create_client_personal_history(const crow::request& req
             // Construct SQL query using {fmt} for parameterized query
             std::string query = fmt::format("INSERT INTO personal_history (name ,phone,json) VALUES ('{}','{}','{}') RETURNING id;",
                 name, phone, jsonData.dump());
-            std::cout << "Query: " << query << '\n';
-            // Execute the query using DatabaseHandler
-            std::string new_id = dbHandler.executeQuery(query);
 
-            res.code = 200;
-            response_json["id"] = std::stoi(new_id);
+            // Execute the query using DatabaseHandler
+            json results = dbHandler.executeQuery(query);
+
+            response_json["id"] = results[0]["id"];
             response_json["msg"] = "Inserted successfully.";
+            res.code = 200;
             res.write(response_json.dump());
+
         } catch (const std::exception& e) {
             // Handle exception (log, etc.)
-            res.code = 500;
-
             response_json["id"] = -2;
             response_json["msg"] = fmt::format("failed: {}", e.what());
-
+            res.code = 500;
             res.write(response_json.dump());
         }
     };

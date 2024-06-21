@@ -11,7 +11,6 @@ json DatabaseHandler::executeQuery(const std::string& query)
     std::shared_ptr<Database> db = nullptr;
     try {
         db = databaseConnectionPool.get_connection();
-        std::cout << "executing query: " << query << '\n';
         json results = db->executeQuery(query);
         databaseConnectionPool.return_connection(db);
         return results;
