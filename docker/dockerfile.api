@@ -22,4 +22,4 @@ RUN chmod +x /usr/src/ProjectValhalla/entrypoint.sh
 EXPOSE 8080
 
 # Use the entrypoint script as the default command
-ENTRYPOINT ["/usr/src/ProjectValhalla/entrypoint.sh"]
+ENTRYPOINT ["/usr/src/ProjectValhalla/docker/entrypoint.sh"]
