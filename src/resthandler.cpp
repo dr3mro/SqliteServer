@@ -24,6 +24,7 @@ void RestHandler::handle_get_patient_basic_information(const crow::request& req,
                 res.write("Not Found");
             } else {
                 res.code = 200;
+                res.add_header("Content-Encoding", "gzip");
                 res.write(result.dump(4)); // Pretty print JSON with 4 spaces indentation
             }
             res.end();
@@ -74,6 +75,7 @@ void RestHandler::handle_create_client_personal_history(const crow::request& req
             response_json["id"] = results[0]["id"];
             response_json["msg"] = "Inserted successfully.";
             res.code = 200;
+            res.add_header("Content-Encoding", "gzip");
             res.write(response_json.dump());
 
         } catch (const std::exception& e) {
