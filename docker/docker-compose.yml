@@ -3,6 +3,18 @@
 version: '3.8'
 
 services:
+  db:
+    build:
+      context: .
+      dockerfile: dockerfile.pq
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      valhalla-network:
+        ipv4_address: 172.20.0.3
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
   api:
     build:
       context: .
@@ -11,24 +23,11 @@ services:
       valhalla-network:
         ipv4_address: 172.20.0.2
     volumes:
-      - projectvalhalla_data:/usr/src/ProjectValhalla
+      - src_data:/usr/src/
     depends_on:
       - db
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
-
-  db:
-    build:
-      context: .
-      dockerfile: dockerfile.pq
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    networks:
-      valhalla-network:
-        ipv4_address: 172.20.0.3
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
 
 networks:
   valhalla-network:
@@ -38,5 +37,5 @@ networks:
         - subnet: 172.20.0.0/16
 
 volumes:
-  db-data:
-  projectvalhalla_data:
+  db_data:
+  src_data:
