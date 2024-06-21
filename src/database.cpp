@@ -21,6 +21,7 @@ json Database::executeQuery(const std::string& query)
     try {
         pqxx::work txn(*connection);
         pqxx::result res = txn.exec(query);
+        txn.commit();
         json results = json::array();
 
         for (const auto& row : res) {
@@ -34,18 +35,6 @@ json Database::executeQuery(const std::string& query)
         return results;
     } catch (const std::exception& e) {
         std::cerr << "Error executing query: " << e.what() << std::endl;
-        throw; // Rethrow the exception to indicate failure
-    }
-}
-
-void Database::executeNonQuery(const std::string& query)
-{
-    try {
-        pqxx::work txn(*connection);
-        txn.exec(query);
-        txn.commit();
-    } catch (const std::exception& e) {
-        std::cerr << "Error executing non-query: " << e.what() << std::endl;
         throw; // Rethrow the exception to indicate failure
     }
 }

@@ -10,10 +10,7 @@ class DatabaseHandler {
 public:
     DatabaseHandler(DatabaseConnectionPool& dbConnPool);
     ~DatabaseHandler() = default;
-
     json executeQuery(const std::string& query);
-
-    void executeNonQuery(const std::string& query);
 
 private:
     DatabaseConnectionPool& databaseConnectionPool;
