@@ -100,7 +100,8 @@ void RestHandler::handle_create_client_personal_history(const crow::request& req
             res.write(response_json_object.dump());
         }
     };
-    res.end();
+
     auto t = threadPool.enqueue(func);
     t.wait(); // Wait for the task to complete
+    res.end();
 }
