@@ -21,18 +21,19 @@ json Database::executeQuery(const std::string& query)
     try {
         pqxx::work txn(*connection);
         pqxx::result res = txn.exec(query);
+
+        json json_array = json::array();
         txn.commit();
-        json results = json::array();
 
         for (const auto& row : res) {
-            json jsonRow;
+            json jsonObj;
             for (const auto& field : row) {
-                jsonRow[field.name()] = field.as<std::string>();
+                jsonObj[field.name()] = json::parse(field.as<std::string>());
             }
-            results.push_back(jsonRow);
+            json_array.push_back(jsonObj);
         }
 
-        return results;
+        return json_array;
     } catch (const std::exception& e) {
         std::cerr << "Error executing query: " << e.what() << std::endl;
         throw; // Rethrow the exception to indicate failure
@@ -45,17 +46,17 @@ json Database::executeReadQuery(const std::string& query)
         pqxx::nontransaction ntxn(*connection);
         pqxx::result res = ntxn.exec(query);
 
-        json json_results;
+        json json_array = json::array();
 
         for (const auto& row : res) {
-            json jsonRow;
+            json jsonObj;
             for (const auto& field : row) {
-                jsonRow[field.name()] = field.as<std::string>();
+                jsonObj[field.name()] = json::parse(field.as<std::string>());
             }
-            json_results.push_back(jsonRow);
+            json_array.push_back(jsonObj);
         }
 
-        return json_results;
+        return json_array;
     } catch (const std::exception& e) {
         std::cerr << "Error executing query: " << e.what() << std::endl;
         throw; // Rethrow the exception to indicate failure
