@@ -89,8 +89,7 @@ void RestHandler::handle_create_client_personal_history(const crow::request& req
             res.code = 200;
             response_json["id"] = std::stoi(new_id);
             response_json["msg"] = "Inserted successfully.";
-            res.write("00000");
-            // res.write(response_json.dump());
+            res.write(response_json.dump());
         } catch (const std::exception& e) {
             // Handle exception (log, etc.)
             res.code = 500;
