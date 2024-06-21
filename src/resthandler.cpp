@@ -17,7 +17,7 @@ void RestHandler::handle_get_patient_basic_information(const crow::request& req,
     auto retry_func = [this, &res, id]() {
         try {
             std::string query = fmt::format("SELECT json FROM personal_history WHERE id = {}", id);
-            json result = dbHandler.executeQuery(query);
+            json result = dbHandler.executeReadQuery(query);
 
             if (result.empty()) {
                 res.code = 404;

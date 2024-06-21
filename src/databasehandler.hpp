@@ -11,6 +11,7 @@ public:
     DatabaseHandler(DatabaseConnectionPool& dbConnPool);
     ~DatabaseHandler() = default;
     json executeQuery(const std::string& query);
+    json executeReadQuery(const std::string& query);
 
 private:
     DatabaseConnectionPool& databaseConnectionPool;

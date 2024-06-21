@@ -38,3 +38,26 @@ json Database::executeQuery(const std::string& query)
         throw; // Rethrow the exception to indicate failure
     }
 }
+
+json Database::executeReadQuery(const std::string& query)
+{
+    try {
+        pqxx::nontransaction ntxn(*connection);
+        pqxx::result res = ntxn.exec(query);
+
+        json results = json::array();
+
+        for (const auto& row : res) {
+            json jsonRow;
+            for (const auto& field : row) {
+                jsonRow[field.name()] = field.as<std::string>();
+            }
+            results.push_back(jsonRow);
+        }
+
+        return results;
+    } catch (const std::exception& e) {
+        std::cerr << "Error executing query: " << e.what() << std::endl;
+        throw; // Rethrow the exception to indicate failure
+    }
+}

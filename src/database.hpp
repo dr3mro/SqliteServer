@@ -13,6 +13,7 @@ public:
 
     bool isConnected();
     json executeQuery(const std::string& query);
+    json executeReadQuery(const std::string& query);
 
 private:
     std::shared_ptr<pqxx::connection> connection;
