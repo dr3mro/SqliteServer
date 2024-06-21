@@ -101,7 +101,6 @@ void RestHandler::handle_create_client_personal_history(const crow::request& req
         }
     };
     res.end();
-    std::cout << "Reached!";
     auto t = threadPool.enqueue(func);
     t.wait(); // Wait for the task to complete
 }
