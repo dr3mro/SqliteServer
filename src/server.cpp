@@ -34,7 +34,7 @@ int main()
         CROW_ROUTE(app, "/post")
             .name("post")
             .methods("POST"_method)([&restHandler](const crow::request& req, crow::response& res) {
-                restHandler.handle_post(req, res);
+                restHandler.handle_create_client_personal_history(req, res);
             });
 
         // Start the server on port 8080

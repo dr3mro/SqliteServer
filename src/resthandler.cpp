@@ -51,54 +51,50 @@ void RestHandler::handle_get(const crow::request& req, crow::response& res, int 
     t.wait(); // Wait for the task to complete
 }
 
-void RestHandler::handle_post(const crow::request& req, crow::response& res)
+uint64_t RestHandler::handle_create_client_personal_history(const crow::request& req, crow::response& res)
 {
-    int max_retry_attempts = 5; // Maximum number of retry attempts
-    int retry_delay_seconds = 1; // Initial retry delay in seconds
+    int64_t new_id = -1; // The returned ID of newly inserted person.
 
-    auto retry_func = [this, &res, &req, &max_retry_attempts, &retry_delay_seconds]() {
+    auto func = [this, &res, &req, &new_id]() {
         auto jsonData = json::parse(req.body);
-        int id = jsonData["id"];
-        std::string value = jsonData["value"];
+
+        uint64_t id = jsonData["id"];
+        std::string name = jsonData["name"];
+        std::string phone = jsonData["phone"];
 
         // Validate input (optional)
-        if (id <= 0 || value.empty()) {
+        if (id != 0 || name.empty() || phone.empty()) {
             res.code = 400;
-            res.write("Bad Request: Invalid id or value");
+            res.write("Bad Request: Invalid id, name or phone ... must be provided.");
             res.end();
+            new_id = -2;
             return;
         }
 
-        for (int attempt = 1; attempt <= max_retry_attempts; ++attempt) {
-            try {
-                // Construct SQL query using {fmt} for parameterized query
-                std::string query = fmt::format("INSERT INTO data (id, value) VALUES ({}, '{}')",
-                    id, value);
+        try {
+            // Construct SQL query using {fmt} for parameterized query
+            std::string query = fmt::format("INSERT INTO personal_history (name ,phone,json) VALUES ('{}','{}','{}') RETURNING id;",
+                name, phone, jsonData.dump());
 
-                // Execute the query using DatabaseHandler
-                dbHandler.executeNonQuery(query);
+            // Execute the query using DatabaseHandler
+            std::string new_id = dbHandler.executeQuery(query);
 
-                res.code = 200;
-                res.write("Inserted successfully");
-                res.end();
-                return; // Successful insert, exit retry loop
-            } catch (const std::exception& e) {
-                // Handle exception (log, etc.)
-                res.code = 500;
-                res.write(fmt::format("Attempt {} failed: {}", attempt, e.what()));
-
-                if (attempt < max_retry_attempts) {
-                    // Sleep before retrying
-                    std::this_thread::sleep_for(std::chrono::seconds(retry_delay_seconds));
-                    // Increase delay for next retry (exponential backoff)
-                    retry_delay_seconds *= 2;
-                }
-            }
+            res.code = 200;
+            res.write("Inserted successfully");
+            res.end();
+            new_id = std::stoi(new_id); // Successful insert and get the new ID
+            return;
+        } catch (const std::exception& e) {
+            // Handle exception (log, etc.)
+            res.code = 500;
+            res.write(fmt::format("Attempt {} failed: {}", e.what()));
+            new_id = -3;
         }
         // If all retries fail, end the response
         res.end();
     };
 
-    auto t = threadPool.enqueue(retry_func);
+    auto t = threadPool.enqueue(func);
     t.wait(); // Wait for the task to complete
+    return new_id;
 }

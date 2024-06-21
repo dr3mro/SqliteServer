@@ -7,7 +7,7 @@ public:
     RestHandler(DatabaseHandler& dbHandler, ThreadPool& threadPool);
 
     void handle_get(const crow::request& req, crow::response& res, int id);
-    void handle_post(const crow::request& req, crow::response& res);
+    uint64_t handle_create_client_personal_history(const crow::request& req, crow::response& res);
 
 private:
     DatabaseHandler& dbHandler;
