@@ -11,46 +11,33 @@ RestHandler::RestHandler(DatabaseHandler& dbHandler, ThreadPool& threadPool)
 {
 }
 
-void RestHandler::handle_get(const crow::request& req, crow::response& res, int id)
+void RestHandler::handle_get_patient_basic_information(const crow::request& req, crow::response& res, int id)
 {
     (void)req;
-    int max_retry_attempts = 5; // Maximum number of retry attempts
-    int retry_delay_seconds = 1; // Initial retry delay in seconds
+    auto retry_func = [this, &res, id]() {
+        try {
+            std::string query = fmt::format("SELECT json FROM personal_history WHERE id = {}", id);
+            json result = dbHandler.executeQuery(query);
 
-    auto retry_func = [this, &res, id, &max_retry_attempts, &retry_delay_seconds]() {
-        for (int attempt = 1; attempt <= max_retry_attempts; ++attempt) {
-            try {
-                std::string query = fmt::format("SELECT * FROM data WHERE id = {}", id);
-                json result = dbHandler.executeQuery(query);
-
-                if (result.empty()) {
-                    res.code = 404;
-                    res.write("Not Found");
-                } else {
-                    res.code = 200;
-                    res.write(result.dump(4)); // Pretty print JSON with 4 spaces indentation
-                }
-                res.end();
-                return; // Successful query, exit retry loop
-            } catch (const std::exception& e) {
-                // Handle exception (log, etc.)
-                res.code = 500;
-                res.write(fmt::format("Attempt {} failed: {}", attempt, e.what()));
-
-                if (attempt < max_retry_attempts) {
-                    // Sleep before retrying
-                    std::this_thread::sleep_for(std::chrono::seconds(retry_delay_seconds));
-                    // Increase delay for next retry (exponential backoff)
-                    retry_delay_seconds *= 2;
-                }
+            if (result.empty()) {
+                res.code = 404;
+                res.write("Not Found");
+            } else {
+                res.code = 200;
+                res.write(result.dump(4)); // Pretty print JSON with 4 spaces indentation
             }
+            res.end();
+            return; // Successful query, exit retry loop
+        } catch (const std::exception& e) {
+            // Handle exception (log, etc.)
+            res.code = 500;
+            res.write(fmt::format("failed: {}", e.what()));
         }
-        // If all retries fail, end the response
-        res.end();
     };
 
     auto t = threadPool.enqueue(retry_func);
     t.wait(); // Wait for the task to complete
+    res.end();
 }
 
 void RestHandler::handle_create_client_personal_history(const crow::request& req, crow::response& res)

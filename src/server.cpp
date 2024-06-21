@@ -26,9 +26,9 @@ int main()
         crow::SimpleApp app;
 
         // GET route example: /get/<int>
-        CROW_ROUTE(app, "/get/<int>")
+        CROW_ROUTE(app, "/api_v1/get_patient_basic_information/<int>")
             .methods("GET"_method)([&restHandler](const crow::request& req, crow::response& res, int id) {
-                restHandler.handle_get(req, res, id);
+                restHandler.handle_get_patient_basic_information(req, res, id);
             });
 
         CROW_ROUTE(app, "/api_v1/create_patient")
