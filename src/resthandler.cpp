@@ -51,11 +51,14 @@ void RestHandler::handle_get(const crow::request& req, crow::response& res, int 
     t.wait(); // Wait for the task to complete
 }
 
-uint64_t RestHandler::handle_create_client_personal_history(const crow::request& req, crow::response& res)
+void RestHandler::handle_create_client_personal_history(const crow::request& req, crow::response& res)
 {
-    int64_t new_id = -1; // The returned ID of newly inserted person.
+    nlohmann::json response_json_object = {
+        { "id", "0" },
+        { "msg", "msg" },
+    };
 
-    auto func = [this, &res, &req, &new_id]() {
+    auto func = [this, &res, &req, &response_json_object]() {
         auto jsonData = json::parse(req.body);
 
         uint64_t id = jsonData["id"];
@@ -65,9 +68,12 @@ uint64_t RestHandler::handle_create_client_personal_history(const crow::request&
         // Validate input (optional)
         if (id != 0 || name.empty() || phone.empty()) {
             res.code = 400;
-            res.write("Bad Request: Invalid id, name or phone ... must be provided.");
+
+            response_json_object["id"] = -1;
+            response_json_object["msg"] = "Bad Request: id, name or phone must be provided.";
+
+            res.write(response_json_object.dump());
             res.end();
-            new_id = -2;
             return;
         }
 
@@ -80,21 +86,24 @@ uint64_t RestHandler::handle_create_client_personal_history(const crow::request&
             std::string new_id = dbHandler.executeQuery(query);
 
             res.code = 200;
-            res.write("Inserted successfully");
+            response_json_object["id"] = std::stoi(new_id);
+            response_json_object["msg"] = "Inserted successfully.";
+
+            res.write(response_json_object.dump());
             res.end();
-            new_id = std::stoi(new_id); // Successful insert and get the new ID
             return;
         } catch (const std::exception& e) {
             // Handle exception (log, etc.)
             res.code = 500;
-            res.write(fmt::format("Attempt {} failed: {}", e.what()));
-            new_id = -3;
+
+            response_json_object["id"] = -2;
+            response_json_object["msg"] = fmt::format("failed: {}", e.what());
+
+            res.write(response_json_object.dump());
         }
-        // If all retries fail, end the response
         res.end();
     };
 
     auto t = threadPool.enqueue(func);
     t.wait(); // Wait for the task to complete
-    return new_id;
 }
