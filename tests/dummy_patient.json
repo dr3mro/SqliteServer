@@ -7,8 +7,5 @@
   "address": "123 Main St, Anytown, USA",
   "occupation": "Engineer",
   "email": "john.doe@example.com",
-  "phone": [
-    "+1234567890",
-    "+1987654321"
-  ]
+  "phone": "+1987654321"
 }
