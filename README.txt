@@ -4,7 +4,7 @@ docker network create valhalla-network
 docker-compose up --build
 
 curl -X POST -H "Content-Type: application/json" -d @dummy_patient.json http://172.20.0.2:8080/api_v1/create_patient -i
-
+curl 172.20.0.2:8080/api_v1/get_patient_basic_information/100000
 psql -U postgres -d postgres -h 172.20.0.3
 
 ===================================================================================
