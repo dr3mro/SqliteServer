@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /usr/src/ProjectValhalla
 
 # Copy entrypoint script into the image
+RUN git clone https://github.com/dr3mro/ProjectValhalla.git /usr/src/ProjectValhalla/
 RUN chmod +x /usr/src/ProjectValhalla/docker/entrypoint.sh
 
 # Expose the port the server listens on
