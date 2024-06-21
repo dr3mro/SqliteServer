@@ -15,8 +15,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /usr/src/ProjectValhalla
 
 # Copy entrypoint script into the image
-COPY entrypoint.sh /usr/src/ProjectValhalla/entrypoint.sh
-RUN chmod +x /usr/src/ProjectValhalla/entrypoint.sh
+RUN chmod +x /usr/src/ProjectValhalla/docker/entrypoint.sh
 
 # Expose the port the server listens on
 EXPOSE 8080
