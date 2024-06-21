@@ -82,7 +82,7 @@ void RestHandler::handle_create_client_personal_history(const crow::request& req
             // Construct SQL query using {fmt} for parameterized query
             std::string query = fmt::format("INSERT INTO personal_history (name ,phone,json) VALUES ('{}','{}','{}') RETURNING id;",
                 name, phone, jsonData.dump());
-
+            std::cout << "Query: " << query << '\n';
             // Execute the query using DatabaseHandler
             std::string new_id = dbHandler.executeQuery(query);
 
