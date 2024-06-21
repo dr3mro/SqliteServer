@@ -3,6 +3,8 @@
 #include <fmt/core.h> // Include fmt library for string formatting
 #include <future>
 
+using json = nlohmann::json;
+
 RestHandler::RestHandler(DatabaseHandler& dbHandler, ThreadPool& threadPool)
     : dbHandler(dbHandler)
     , threadPool(threadPool)
@@ -53,12 +55,13 @@ void RestHandler::handle_get(const crow::request& req, crow::response& res, int 
 
 void RestHandler::handle_create_client_personal_history(const crow::request& req, crow::response& res)
 {
-    nlohmann::json response_json_object = {
-        { "id", "0" },
-        { "msg", "msg" },
-    };
 
-    auto func = [this, &res, &req, &response_json_object]() {
+    auto func = [this, &res, &req]() {
+        json response_json = {
+            { "id", "0" },
+            { "msg", "msg" },
+        };
+
         auto jsonData = json::parse(req.body);
 
         uint64_t id = jsonData["id"];
@@ -69,10 +72,10 @@ void RestHandler::handle_create_client_personal_history(const crow::request& req
         if (id != 0 || name.empty() || phone.empty()) {
             res.code = 400;
 
-            response_json_object["id"] = -1;
-            response_json_object["msg"] = "Bad Request: id, name or phone must be provided.";
+            response_json["id"] = -1;
+            response_json["msg"] = "Bad Request: id, name or phone must be provided.";
 
-            res.write(response_json_object.dump());
+            res.write(response_json.dump());
             return;
         }
 
@@ -85,19 +88,18 @@ void RestHandler::handle_create_client_personal_history(const crow::request& req
             std::string new_id = dbHandler.executeQuery(query);
 
             res.code = 200;
-            response_json_object["id"] = std::stoi(new_id);
-            response_json_object["msg"] = "Inserted successfully.";
+            response_json["id"] = std::stoi(new_id);
+            response_json["msg"] = "Inserted successfully.";
 
-            res.write(response_json_object.dump());
-            return;
+            res.write(response_json.dump());
         } catch (const std::exception& e) {
             // Handle exception (log, etc.)
             res.code = 500;
 
-            response_json_object["id"] = -2;
-            response_json_object["msg"] = fmt::format("failed: {}", e.what());
+            response_json["id"] = -2;
+            response_json["msg"] = fmt::format("failed: {}", e.what());
 
-            res.write(response_json_object.dump());
+            res.write(response_json.dump());
         }
     };
 
