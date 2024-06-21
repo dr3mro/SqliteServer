@@ -14,7 +14,7 @@ RestHandler::RestHandler(DatabaseHandler& dbHandler, ThreadPool& threadPool)
 void RestHandler::handle_get_patient_basic_information(const crow::request& req, crow::response& res, int id)
 {
     (void)req;
-    auto retry_func = [this, &res, id]() {
+    auto func = [this, &res, id]() {
         try {
             std::string query = fmt::format("SELECT json FROM personal_history WHERE id = {}", id);
             json result = dbHandler.executeReadQuery(query);
@@ -35,7 +35,7 @@ void RestHandler::handle_get_patient_basic_information(const crow::request& req,
         }
     };
 
-    auto t = threadPool.enqueue(retry_func);
+    auto t = threadPool.enqueue(func);
     t.wait(); // Wait for the task to complete
     res.end();
 }
