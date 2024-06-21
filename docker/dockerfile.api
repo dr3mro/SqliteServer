@@ -1,5 +1,4 @@
-# Dockerfile.api
-
+# Use a specific version of Ubuntu for consistency
 FROM ubuntu:latest
 
 # Install dependencies
@@ -12,19 +11,15 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Clone the repository
-RUN git clone https://github.com/dr3mro/ProjectValhalla.git /usr/src/ProjectValhalla
-
 # Set working directory
 WORKDIR /usr/src/ProjectValhalla
 
-# Build the project
-RUN git pull
-RUN cmake -GNinja .
-RUN ninja
+# Copy entrypoint script into the image
+COPY entrypoint.sh /usr/src/ProjectValhalla/entrypoint.sh
+RUN chmod +x /usr/src/ProjectValhalla/entrypoint.sh
 
 # Expose the port the server listens on
 EXPOSE 8080
 
-# Command to run the executable
-CMD ["./server"]
+# Use the entrypoint script as the default command
+ENTRYPOINT ["/usr/src/ProjectValhalla/entrypoint.sh"]
