@@ -38,7 +38,7 @@ int main()
 
         // Start the server on port 8080
         // app.loglevel(crow::LogLevel::Critical);
-        app.port(8080).multithreaded().run();
+        app.use_compression(crow::compression::algorithm::GZIP).port(8080).multithreaded().run();
     } catch (const std::exception& e) {
         std::cerr << "Exception caught in main: " << e.what() << std::endl;
         return 1; // Exit with error code
