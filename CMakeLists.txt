@@ -17,6 +17,7 @@ CPMAddPackage("gh:fmtlib/fmt#10.2.1")
 CPMAddPackage("gh:chriskohlhoff/asio#asio-1-30-2")
 CPMAddPackage("gh:CrowCpp/crow#v1.2.0")
 CPMAddPackage("gh:jtv/libpqxx#7.9.1")
+CPMAddPackage("gh:jbeder/yaml-cpp#0.8.0")
 
 file (GLOB_RECURSE SRC "src/*.cpp" )
 
@@ -29,9 +30,10 @@ target_include_directories(${Target}
                         "${crow_SOURCE_DIR}/include"
                         "${asio_SOURCE_DIR}/asio/include"
                         "${libpqxx_SOURCE_DIR}/include"
+                        "${yaml-cpp_SOURCE_DIR}/src"
                         )
 
-target_link_libraries(${Target}  PRIVATE  fmt  pqxx ${PostgreSQL_LIBRARIES})
+target_link_libraries(${Target}  PRIVATE  fmt  pqxx yaml-cpp ${PostgreSQL_LIBRARIES})
 
 
 
