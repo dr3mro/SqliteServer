@@ -6,8 +6,11 @@ class RestHandler {
 public:
     RestHandler(DatabaseHandler& dbHandler, ThreadPool& threadPool);
 
-    void handle_get_patient_basic_information(const crow::request& req, crow::response& res, int id);
-    void handle_create_client_personal_history(const crow::request& req, crow::response& res);
+    // CRUD
+    void create_patient_basic_information(const crow::request& req, crow::response& res);
+    void read_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id);
+    void update_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id);
+    void delete_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id);
 
 private:
     DatabaseHandler& dbHandler;

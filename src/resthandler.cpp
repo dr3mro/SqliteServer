@@ -11,37 +11,7 @@ RestHandler::RestHandler(DatabaseHandler& dbHandler, ThreadPool& threadPool)
 {
 }
 
-void RestHandler::handle_get_patient_basic_information(const crow::request& req, crow::response& res, int id)
-{
-    (void)req;
-    auto func = [this, &res, id]() {
-        try {
-            std::string query = fmt::format("SELECT json FROM personal_history WHERE id = {}", id);
-            json result = dbHandler.executeReadQuery(query);
-
-            if (result.empty()) {
-                res.code = 404;
-                res.write("Not Found");
-            } else {
-                res.code = 200;
-                res.add_header("Content-Encoding", "gzip");
-                res.write(result.dump(4)); // Pretty print JSON with 4 spaces indentation
-            }
-            res.end();
-            return; // Successful query, exit retry loop
-        } catch (const std::exception& e) {
-            // Handle exception (log, etc.)
-            res.code = 500;
-            res.write(fmt::format("failed: {}", e.what()));
-        }
-    };
-
-    auto t = threadPool.enqueue(func);
-    t.wait(); // Wait for the task to complete
-    res.end();
-}
-
-void RestHandler::handle_create_client_personal_history(const crow::request& req, crow::response& res)
+void RestHandler::create_patient_basic_information(const crow::request& req, crow::response& res)
 {
     auto func = [this, &res, &req]() {
         json response_json = {
@@ -90,4 +60,41 @@ void RestHandler::handle_create_client_personal_history(const crow::request& req
     auto t = threadPool.enqueue(func);
     t.wait(); // Wait for the task to complete
     res.end();
+}
+
+void RestHandler::read_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
+{
+    (void)req;
+    auto func = [this, &res, id]() {
+        try {
+            std::string query = fmt::format("SELECT json FROM personal_history WHERE id = {}", id);
+            json result = dbHandler.executeReadQuery(query);
+
+            if (result.empty()) {
+                res.code = 404;
+                res.write("Not Found");
+            } else {
+                res.code = 200;
+                res.add_header("Content-Encoding", "gzip");
+                res.write(result.dump(4)); // Pretty print JSON with 4 spaces indentation
+            }
+            res.end();
+            return; // Successful query, exit retry loop
+        } catch (const std::exception& e) {
+            // Handle exception (log, etc.)
+            res.code = 500;
+            res.write(fmt::format("failed: {}", e.what()));
+        }
+    };
+
+    auto t = threadPool.enqueue(func);
+    t.wait(); // Wait for the task to complete
+    res.end();
+}
+
+void RestHandler::update_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
+{
+}
+void RestHandler::delete_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
+{
 }

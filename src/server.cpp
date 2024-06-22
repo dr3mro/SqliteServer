@@ -25,15 +25,24 @@ int main()
         // Initialize Crow application
         crow::SimpleApp app;
 
+        CROW_ROUTE(app, "/api_v1/create_patient_basic_information")
+            .methods("POST"_method)([&restHandler](const crow::request& req, crow::response& res) {
+                restHandler.create_patient_basic_information(req, res);
+            });
         // GET route example: /get/<int>
-        CROW_ROUTE(app, "/api_v1/get_patient_basic_information/<int>")
-            .methods("GET"_method)([&restHandler](const crow::request& req, crow::response& res, int id) {
-                restHandler.handle_get_patient_basic_information(req, res, id);
+        CROW_ROUTE(app, "/api_v1/read_patient_basic_information/<int>")
+            .methods("GET"_method)([&restHandler](const crow::request& req, crow::response& res, uint64_t id) {
+                restHandler.read_patient_basic_information(req, res, id);
             });
 
-        CROW_ROUTE(app, "/api_v1/create_patient")
-            .methods("POST"_method)([&restHandler](const crow::request& req, crow::response& res) {
-                restHandler.handle_create_client_personal_history(req, res);
+        CROW_ROUTE(app, "/api_v1/update_patient_basic_information/<int>")
+            .methods("POST"_method)([&restHandler](const crow::request& req, crow::response& res, uint64_t id) {
+                restHandler.update_patient_basic_information(req, res, id);
+            });
+
+        CROW_ROUTE(app, "/api_v1/delete_patient_basic_information/<int>")
+            .methods("POST"_method)([&restHandler](const crow::request& req, crow::response& res, uint64_t id) {
+                restHandler.delete_patient_basic_information(req, res, id);
             });
 
         // Start the server on port 8080
