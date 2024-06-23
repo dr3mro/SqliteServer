@@ -21,9 +21,9 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
             uint64_t nextid = get_next_patient_id();
 
             if (nextid == 0) {
-                std::cout << "failed to get nextval\n";
                 res.code = 401;
-                res.write("Failed to create a new patient.");
+                format_response(response_json, -1, "failed to create a new patient", "failed to get nextval");
+                res.write(response_json.dump(4));
                 return;
             }
 
@@ -37,11 +37,7 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
             // Execute the query using DatabaseHandler
             json query_results_json = dbHandler.executeQuery(query);
 
-            response_json["status message"] = "success";
-            response_json["status code"] = 0;
-            response_json["response"] = query_results_json;
-
-            // response_json["response"] = "creating patient basic information is successful.";
+            format_response(response_json, 0, "success", query_results_json);
 
             res.code = 200;
             res.add_header("Content-Encoding", "gzip");
@@ -49,9 +45,8 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
 
         } catch (const std::exception& e) {
             // Handle exception (log, etc.)
-            response_json["status message"] = "failure";
-            response_json["status code"] = -1;
-            response_json["response"] = fmt::format("failed: {}", e.what());
+            format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
+
             res.code = 500;
             res.write(response_json.dump());
         }
@@ -79,11 +74,10 @@ void RestHandler::read_patient_basic_information(const crow::request& req, crow:
                 response_json["response"] = query_results_json;
                 res.write(response_json.dump());
             } else {
+                format_response(response_json, 0, "success", query_results_json);
+
                 res.code = 200;
                 res.add_header("Content-Encoding", "gzip");
-                response_json["status message"] = "success";
-                response_json["status code"] = 0;
-                response_json["response"] = query_results_json;
                 res.write(response_json.dump(4)); // Pretty print JSON with 4 spaces indentation
             }
             res.end();
@@ -91,9 +85,8 @@ void RestHandler::read_patient_basic_information(const crow::request& req, crow:
         } catch (const std::exception& e) {
             // Handle exception (log, etc.)
             res.code = 500;
-            response_json["status message"] = "failure";
-            response_json["status code"] = -2;
-            response_json["response"] = fmt::format("failed: {}", e.what());
+
+            format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
             res.write(response_json.dump(4));
         }
     };
@@ -119,9 +112,7 @@ void RestHandler::update_patient_basic_information(const crow::request& req, cro
             // Execute the query using DatabaseHandler
             json query_results_json = dbHandler.executeQuery(query);
 
-            response_json["status message"] = "success";
-            response_json["status code"] = 0;
-            response_json["response"] = query_results_json;
+            format_response(response_json, 0, "success", query_results_json);
 
             res.code = 200;
             res.add_header("Content-Encoding", "gzip");
@@ -129,9 +120,8 @@ void RestHandler::update_patient_basic_information(const crow::request& req, cro
 
         } catch (const std::exception& e) {
             // Handle exception (log, etc.)
-            response_json["status message"] = "failure";
-            response_json["status code"] = -1;
-            response_json["response"] = fmt::format("failed: {}", e.what());
+            format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
+
             res.code = 500;
             res.write(response_json.dump());
         }
@@ -153,18 +143,19 @@ void RestHandler::delete_patient_basic_information(const crow::request& req, cro
             std::string query = fmt::format("DELETE * FROM patients_basic_data WHERE id={};", id);
 
             // Execute the query using DatabaseHandler
-            json results = dbHandler.executeQuery(query);
+            json query_results_json = dbHandler.executeQuery(query);
+
+            format_response(response_json, 0, "success", query_results_json);
 
             res.code = 200;
             res.add_header("Content-Encoding", "gzip");
-            res.write(results.dump(4));
+            res.write(response_json.dump(4));
 
         } catch (const std::exception& e) {
             // Handle exception (log, etc.)
+            format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
+
             res.code = 500;
-            response_json["status id"] = -2;
-            response_json["status message"] = fmt::format("failed: {}", e.what());
-            response_json["response"] = fmt::format("failed: {}", e.what());
             res.write(response_json.dump());
         }
     };
@@ -185,4 +176,11 @@ uint64_t RestHandler::get_next_patient_id()
         }
     }
     return 0;
+}
+
+void RestHandler::format_response(json& response_json, const short status, const std::string& status_message, const std::string& response)
+{
+    response_json["status id"] = status;
+    response_json["status message"] = status_message;
+    response_json["response"] = response;
 }
