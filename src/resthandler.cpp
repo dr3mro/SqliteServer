@@ -105,6 +105,41 @@ void RestHandler::read_patient_basic_information(const crow::request& req, crow:
 
 void RestHandler::update_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
 {
+    auto func = [this, &res, &req, id]() {
+        json response_json;
+
+        auto basic_data_json = json::parse(req.body);
+
+        try {
+            // Construct SQL query using {fmt} for parameterized query
+            std::string query
+                = fmt::format("UPDATE patients_basic_data SET basic_data = '{}' WHERE id = '{}' RETURNING basic_data;",
+                    basic_data_json.dump(), id);
+
+            // Execute the query using DatabaseHandler
+            json query_results_json = dbHandler.executeQuery(query);
+
+            response_json["status message"] = "success";
+            response_json["status code"] = 0;
+            response_json["response"] = query_results_json;
+
+            res.code = 200;
+            res.add_header("Content-Encoding", "gzip");
+            res.write(response_json.dump(4));
+
+        } catch (const std::exception& e) {
+            // Handle exception (log, etc.)
+            response_json["status message"] = "failure";
+            response_json["status code"] = -1;
+            response_json["response"] = fmt::format("failed: {}", e.what());
+            res.code = 500;
+            res.write(response_json.dump());
+        }
+    };
+
+    auto t = threadPool.enqueue(func);
+    t.wait(); // Wait for the task to complete
+    res.end();
 }
 void RestHandler::delete_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
 {
