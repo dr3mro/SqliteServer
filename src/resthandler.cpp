@@ -62,7 +62,7 @@ void RestHandler::read_patient_basic_information(const crow::request& req, crow:
                 format_response(response_json, -1, "not found", query_results_json);
                 return finish_response(res, 404, response_json.dump(4));
             } else {
-                evaluate_response(response_json, query_results_json);
+                format_response(response_json, 0, "success", query_results_json);
                 return finish_response(res, 200, response_json.dump(4));
             }
             return; // Successful query, exit retry loop
