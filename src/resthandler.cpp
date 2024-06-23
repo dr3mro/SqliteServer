@@ -68,10 +68,9 @@ void RestHandler::read_patient_basic_information(const crow::request& req, crow:
             json query_results_json = dbHandler.executeReadQuery(query);
 
             if (query_results_json.empty()) {
+                format_response(response_json, -1, "failure", query_results_json);
+
                 res.code = 404;
-                response_json["status message"] = "failure";
-                response_json["status code"] = -1;
-                response_json["response"] = query_results_json;
                 res.write(response_json.dump());
             } else {
                 format_response(response_json, 0, "success", query_results_json);
@@ -84,9 +83,9 @@ void RestHandler::read_patient_basic_information(const crow::request& req, crow:
             return; // Successful query, exit retry loop
         } catch (const std::exception& e) {
             // Handle exception (log, etc.)
-            res.code = 500;
-
             format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
+
+            res.code = 500;
             res.write(response_json.dump(4));
         }
     };
