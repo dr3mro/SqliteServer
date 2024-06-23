@@ -21,10 +21,8 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
             uint64_t nextid = get_next_patient_id();
 
             if (nextid == 0) {
-                res.code = 401;
                 format_response(response_json, -1, "failed to create a new patient", "failed to get nextval");
-                res.write(response_json.dump(4));
-                return;
+                return finish_response(res, 401, response_json.dump(4));
             }
 
             basic_data_json["id"] = nextid;
@@ -38,22 +36,16 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
             json query_results_json = dbHandler.executeQuery(query);
 
             make_response(response_json, query_results_json);
-
-            res.code = 200;
-            res.write(response_json.dump(4));
-
+            return finish_response(res, 200, response_json.dump(4));
         } catch (const std::exception& e) {
             // Handle exception (log, etc.)
             format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
-
-            res.code = 500;
-            res.write(response_json.dump());
+            return finish_response(res, 500, response_json.dump(4));
         }
     };
 
     auto t = threadPool.enqueue(func);
     t.wait(); // Wait for the task to complete
-    res.end();
 }
 
 void RestHandler::read_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
@@ -68,29 +60,21 @@ void RestHandler::read_patient_basic_information(const crow::request& req, crow:
 
             if (query_results_json.empty()) {
                 format_response(response_json, -1, "not found", query_results_json);
-
-                res.code = 404;
-                res.write(response_json.dump());
+                return finish_response(res, 404, response_json.dump(4));
             } else {
                 make_response(response_json, query_results_json);
-
-                res.code = 200;
-                res.write(response_json.dump(4)); // Pretty print JSON with 4 spaces indentation
+                return finish_response(res, 200, response_json.dump(4));
             }
-            res.end();
             return; // Successful query, exit retry loop
         } catch (const std::exception& e) {
             // Handle exception (log, etc.)
             format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
-
-            res.code = 500;
-            res.write(response_json.dump(4));
+            return finish_response(res, 500, response_json.dump(4));
         }
     };
 
     auto t = threadPool.enqueue(func);
     t.wait(); // Wait for the task to complete
-    res.end();
 }
 
 void RestHandler::update_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
@@ -110,22 +94,17 @@ void RestHandler::update_patient_basic_information(const crow::request& req, cro
             json query_results_json = dbHandler.executeQuery(query);
 
             make_response(response_json, query_results_json);
-
-            res.code = 200;
-            res.write(response_json.dump(4));
+            return finish_response(res, 200, response_json.dump(4));
 
         } catch (const std::exception& e) {
             // Handle exception (log, etc.)
             format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
-
-            res.code = 500;
-            res.write(response_json.dump());
+            return finish_response(res, 500, response_json.dump(4));
         }
     };
 
     auto t = threadPool.enqueue(func);
     t.wait(); // Wait for the task to complete
-    res.end();
 }
 void RestHandler::delete_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
 {
@@ -142,22 +121,17 @@ void RestHandler::delete_patient_basic_information(const crow::request& req, cro
             json query_results_json = dbHandler.executeQuery(query);
 
             make_response(response_json, query_results_json);
-
-            res.code = 200;
-            res.write(response_json.dump(4));
+            return finish_response(res, 200, response_json.dump(4));
 
         } catch (const std::exception& e) {
             // Handle exception (log, etc.)
             format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
-
-            res.code = 500;
-            res.write(response_json.dump());
+            return finish_response(res, 500, response_json.dump(4));
         }
     };
 
     auto t = threadPool.enqueue(func);
     t.wait(); // Wait for the task to complete
-    res.end();
 }
 
 uint64_t RestHandler::get_next_patient_id()
@@ -195,4 +169,11 @@ void RestHandler::format_response(json& response_json, const short status, const
     response_json["status id"] = status;
     response_json["status message"] = status_message;
     response_json["response"] = response;
+}
+
+void RestHandler::finish_response(crow::response& res, const int& code, const std::string& body)
+{
+    res.code = code;
+    res.write(body);
+    res.end();
 }
