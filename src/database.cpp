@@ -21,9 +21,13 @@ json Database::executeQuery(const std::string& query)
     try {
         pqxx::work txn(*connection);
         pqxx::result res = txn.exec(query);
+        txn.commit();
 
         json json_array = json::array();
-        txn.commit();
+        json affected_rows;
+
+        affected_rows["affected rows"] = res.affected_rows();
+        json_array.push_back(affected_rows);
 
         for (const auto& row : res) {
             json jsonObj;
@@ -40,7 +44,7 @@ json Database::executeQuery(const std::string& query)
     }
 }
 
-json Database::executeReadQuery(const std::string& query)
+json Database::executeReadQuery(const std::string& query) // this query has no commit
 {
     try {
         pqxx::nontransaction ntxn(*connection);

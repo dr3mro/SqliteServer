@@ -41,7 +41,7 @@ int main()
             });
 
         CROW_ROUTE(app, "/api_v1/delete_patient_basic_information/<int>")
-            .methods("POST"_method)([&restHandler](const crow::request& req, crow::response& res, uint64_t id) {
+            .methods("GET"_method)([&restHandler](const crow::request& req, crow::response& res, uint64_t id) {
                 restHandler.delete_patient_basic_information(req, res, id);
             });
 

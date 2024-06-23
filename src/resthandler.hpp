@@ -2,6 +2,8 @@
 #include "threadpool.hpp"
 #include <crow.h>
 
+using json = nlohmann::json;
+
 class RestHandler {
 public:
     RestHandler(DatabaseHandler& dbHandler, ThreadPool& threadPool);
@@ -15,4 +17,7 @@ public:
 private:
     DatabaseHandler& dbHandler;
     ThreadPool& threadPool;
+
+    // assistive methods
+    uint64_t get_next_patient_id();
 };
