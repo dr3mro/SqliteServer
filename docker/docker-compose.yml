@@ -1,6 +1,4 @@
-# docker-compose.yml
-
-version: '3.8'
+version: '3.9'
 
 services:
   db:
@@ -10,7 +8,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
-      valhalla-network:
+      docker_valhalla-network:
         ipv4_address: 172.20.0.3
     environment:
       POSTGRES_USER: postgres
@@ -20,7 +18,7 @@ services:
       context: .
       dockerfile: dockerfile.api
     networks:
-      valhalla-network:
+      docker_valhalla-network:
         ipv4_address: 172.20.0.2
     volumes:
       - src_data:/usr/src/
@@ -30,8 +28,7 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
 
 networks:
-  valhalla-network:
-    external: true
+  docker_valhalla-network:
     driver: bridge
     ipam:
       config:
