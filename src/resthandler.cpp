@@ -35,7 +35,7 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
             // Execute the query using DatabaseHandler
             json query_results_json = dbHandler.executeQuery(query);
 
-            make_response(response_json, query_results_json);
+            evaluate_response(response_json, query_results_json);
             return finish_response(res, 200, response_json.dump(4));
         } catch (const std::exception& e) {
             // Handle exception (log, etc.)
@@ -62,7 +62,7 @@ void RestHandler::read_patient_basic_information(const crow::request& req, crow:
                 format_response(response_json, -1, "not found", query_results_json);
                 return finish_response(res, 404, response_json.dump(4));
             } else {
-                make_response(response_json, query_results_json);
+                evaluate_response(response_json, query_results_json);
                 return finish_response(res, 200, response_json.dump(4));
             }
             return; // Successful query, exit retry loop
@@ -93,7 +93,7 @@ void RestHandler::update_patient_basic_information(const crow::request& req, cro
             // Execute the query using DatabaseHandler
             json query_results_json = dbHandler.executeQuery(query);
 
-            make_response(response_json, query_results_json);
+            evaluate_response(response_json, query_results_json);
             return finish_response(res, 200, response_json.dump(4));
 
         } catch (const std::exception& e) {
@@ -120,7 +120,7 @@ void RestHandler::delete_patient_basic_information(const crow::request& req, cro
             // Execute the query using DatabaseHandler
             json query_results_json = dbHandler.executeQuery(query);
 
-            make_response(response_json, query_results_json);
+            evaluate_response(response_json, query_results_json);
             return finish_response(res, 200, response_json.dump(4));
 
         } catch (const std::exception& e) {
@@ -157,7 +157,7 @@ bool RestHandler::check_affected_rows(const json& response)
     return false;
 }
 
-void RestHandler::make_response(json& response_json, const json& query_results_json)
+void RestHandler::evaluate_response(json& response_json, const json& query_results_json)
 {
     if (check_affected_rows(query_results_json))
         format_response(response_json, 0, "success", query_results_json);
