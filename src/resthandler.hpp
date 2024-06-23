@@ -20,5 +20,5 @@ private:
 
     // assistive methods
     uint64_t get_next_patient_id();
-    void format_response(json& response_json, const short status, const std::string& status_message, const std::string& response);
+    void format_response(json& response_json, const short status, const std::string& status_message, const json& response);
 };

@@ -173,7 +173,7 @@ uint64_t RestHandler::get_next_patient_id()
     return 0;
 }
 
-void RestHandler::format_response(json& response_json, const short status, const std::string& status_message, const std::string& response)
+void RestHandler::format_response(json& response_json, const short status, const std::string& status_message, const json& response)
 {
     response_json["status id"] = status;
     response_json["status message"] = status_message;
