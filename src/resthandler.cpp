@@ -50,8 +50,8 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
 
 void RestHandler::read_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
 {
-    (void)req;
-    auto func = [this, &res, id]() {
+    auto func = [this, &req, &res, id]() {
+        (void)req;
         json response_json;
         try {
             std::string query
@@ -108,9 +108,8 @@ void RestHandler::update_patient_basic_information(const crow::request& req, cro
 }
 void RestHandler::delete_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
 {
-    (void)req;
-
-    auto func = [this, &res, id]() {
+    auto func = [this, &req, &res, id]() {
+        (void)req;
         json response_json;
 
         try {
