@@ -40,7 +40,6 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
             format_response(response_json, 0, "success", query_results_json);
 
             res.code = 200;
-            res.add_header("Content-Encoding", "gzip");
             res.write(response_json.dump(4));
 
         } catch (const std::exception& e) {
@@ -76,7 +75,6 @@ void RestHandler::read_patient_basic_information(const crow::request& req, crow:
                 format_response(response_json, 0, "success", query_results_json);
 
                 res.code = 200;
-                res.add_header("Content-Encoding", "gzip");
                 res.write(response_json.dump(4)); // Pretty print JSON with 4 spaces indentation
             }
             res.end();
@@ -114,7 +112,6 @@ void RestHandler::update_patient_basic_information(const crow::request& req, cro
             format_response(response_json, 0, "success", query_results_json);
 
             res.code = 200;
-            res.add_header("Content-Encoding", "gzip");
             res.write(response_json.dump(4));
 
         } catch (const std::exception& e) {
@@ -147,7 +144,6 @@ void RestHandler::delete_patient_basic_information(const crow::request& req, cro
             format_response(response_json, 0, "success", query_results_json);
 
             res.code = 200;
-            res.add_header("Content-Encoding", "gzip");
             res.write(response_json.dump(4));
 
         } catch (const std::exception& e) {

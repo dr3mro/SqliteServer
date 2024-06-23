@@ -27,21 +27,25 @@ int main()
 
         CROW_ROUTE(app, "/api_v1/create_patient_basic_information")
             .methods("POST"_method)([&restHandler](const crow::request& req, crow::response& res) {
+                res.add_header("Content-Encoding", "gzip");
                 restHandler.create_patient_basic_information(req, res);
             });
         // GET route example: /get/<int>
         CROW_ROUTE(app, "/api_v1/read_patient_basic_information/<int>")
             .methods("GET"_method)([&restHandler](const crow::request& req, crow::response& res, uint64_t id) {
+                res.add_header("Content-Encoding", "gzip");
                 restHandler.read_patient_basic_information(req, res, id);
             });
 
         CROW_ROUTE(app, "/api_v1/update_patient_basic_information/<int>")
             .methods("POST"_method)([&restHandler](const crow::request& req, crow::response& res, uint64_t id) {
+                res.add_header("Content-Encoding", "gzip");
                 restHandler.update_patient_basic_information(req, res, id);
             });
 
         CROW_ROUTE(app, "/api_v1/delete_patient_basic_information/<int>")
             .methods("GET"_method)([&restHandler](const crow::request& req, crow::response& res, uint64_t id) {
+                res.add_header("Content-Encoding", "gzip");
                 restHandler.delete_patient_basic_information(req, res, id);
             });
 
