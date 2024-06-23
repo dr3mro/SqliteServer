@@ -37,7 +37,7 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
             // Execute the query using DatabaseHandler
             json query_results_json = dbHandler.executeQuery(query);
 
-            format_response(response_json, 0, "success", query_results_json);
+            make_response(response_json, query_results_json);
 
             res.code = 200;
             res.write(response_json.dump(4));
@@ -67,12 +67,12 @@ void RestHandler::read_patient_basic_information(const crow::request& req, crow:
             json query_results_json = dbHandler.executeReadQuery(query);
 
             if (query_results_json.empty()) {
-                format_response(response_json, -1, "failure", query_results_json);
+                format_response(response_json, -1, "not found", query_results_json);
 
                 res.code = 404;
                 res.write(response_json.dump());
             } else {
-                format_response(response_json, 0, "success", query_results_json);
+                make_response(response_json, query_results_json);
 
                 res.code = 200;
                 res.write(response_json.dump(4)); // Pretty print JSON with 4 spaces indentation
@@ -109,7 +109,7 @@ void RestHandler::update_patient_basic_information(const crow::request& req, cro
             // Execute the query using DatabaseHandler
             json query_results_json = dbHandler.executeQuery(query);
 
-            format_response(response_json, 0, "success", query_results_json);
+            make_response(response_json, query_results_json);
 
             res.code = 200;
             res.write(response_json.dump(4));
@@ -136,12 +136,12 @@ void RestHandler::delete_patient_basic_information(const crow::request& req, cro
 
         try {
             // Construct SQL query using {fmt} for parameterized query
-            std::string query = fmt::format("DELETE * FROM patients_basic_data WHERE id={};", id);
+            std::string query = fmt::format("DELETE FROM patients_basic_data WHERE id={};", id);
 
             // Execute the query using DatabaseHandler
             json query_results_json = dbHandler.executeQuery(query);
 
-            format_response(response_json, 0, "success", query_results_json);
+            make_response(response_json, query_results_json);
 
             res.code = 200;
             res.write(response_json.dump(4));
@@ -172,7 +172,24 @@ uint64_t RestHandler::get_next_patient_id()
     }
     return 0;
 }
+bool RestHandler::check_affected_rows(const json& response)
+{
 
+    for (const auto& obj : response) {
+        if (obj.contains("affected rows")) {
+            return obj["affected rows"] == 1;
+        }
+    }
+    return false;
+}
+
+void RestHandler::make_response(json& response_json, const json& query_results_json)
+{
+    if (check_affected_rows(query_results_json))
+        format_response(response_json, 0, "success", query_results_json);
+    else
+        format_response(response_json, -1, "failure", query_results_json);
+}
 void RestHandler::format_response(json& response_json, const short status, const std::string& status_message, const json& response)
 {
     response_json["status id"] = status;

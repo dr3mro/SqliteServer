@@ -20,5 +20,7 @@ private:
 
     // assistive methods
     uint64_t get_next_patient_id();
+    bool check_affected_rows(const json& response);
+    void make_response(json& response_json, const json& query_results_json);
     void format_response(json& response_json, const short status, const std::string& status_message, const json& response);
 };
