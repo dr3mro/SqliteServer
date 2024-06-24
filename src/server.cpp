@@ -47,7 +47,7 @@ int main()
 
         // Start the server on port 8080
         std::cout << "database server is started.\n";
-        // app.loglevel(crow::LogLevel::Critical);
+        app.loglevel(crow::LogLevel::Critical);
         app.use_compression(crow::compression::algorithm::GZIP).port(8080).concurrency(16).run();
     } catch (const std::exception& e) {
         std::cerr << "Exception caught in main: " << e.what() << std::endl;

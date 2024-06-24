@@ -73,7 +73,7 @@ void RestHandler::read_patient_basic_information(const crow::request& req, crow:
     };
 
     auto t = threadPool.enqueue(func);
-    t.wait(); // Wait for the task to complete
+    t.get(); // Wait for the task to complete
 }
 
 void RestHandler::update_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
