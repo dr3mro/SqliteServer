@@ -172,7 +172,6 @@ void RestHandler::format_response(json& response_json, const short status, const
 
 void RestHandler::finish_response(crow::response& res, const int& code, const std::string& body)
 {
-    res.add_header("Content-Encoding", "gzip");
     res.code = code;
     res.write(body);
     res.end();
