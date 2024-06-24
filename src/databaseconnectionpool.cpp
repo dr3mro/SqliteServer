@@ -18,7 +18,7 @@ DatabaseConnectionPool::DatabaseConnectionPool(size_t pool_size)
             if (conn->is_open()) {
                 auto database = std::make_shared<Database>(conn);
                 databaseConnections.push(database);
-                std::cout << "Database connection added to pool." << std::endl;
+                // std::cout << "Database connection added to pool." << std::endl;
             } else {
                 std::cerr << "Failed to open database connection" << std::endl;
             }
@@ -38,7 +38,7 @@ std::shared_ptr<Database> DatabaseConnectionPool::get_connection()
     }
     auto db = databaseConnections.front();
     databaseConnections.pop();
-    std::cout << "Database connection retrieved from pool. Connections remaining: " << databaseConnections.size() << std::endl;
+    // std::cout << "Database connection retrieved from pool. Connections remaining: " << databaseConnections.size() << std::endl;
     return db;
 }
 
@@ -48,5 +48,5 @@ void DatabaseConnectionPool::return_connection(std::shared_ptr<Database> db)
     std::lock_guard<std::mutex> lock(mutex);
     databaseConnections.push(db);
     cv.notify_one();
-    std::cout << "Database connection returned to pool. Connections available: " << databaseConnections.size() << std::endl;
+    // std::cout << "Database connection returned to pool. Connections available: " << databaseConnections.size() << std::endl;
 }

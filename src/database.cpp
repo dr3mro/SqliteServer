@@ -5,7 +5,7 @@ Database::Database(std::shared_ptr<pqxx::connection> conn)
     : connection(conn)
 {
     if (connection->is_open()) {
-        std::cout << "Opened database successfully: " << conn->dbname() << std::endl;
+        // std::cout << "Opened database successfully: " << conn->dbname() << std::endl;
     } else {
         std::cerr << "Failed to open database" << std::endl;
     }

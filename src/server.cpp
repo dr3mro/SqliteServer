@@ -14,8 +14,8 @@ int main()
         unsigned int ncpus = std::thread::hardware_concurrency() ? std::thread::hardware_concurrency() : 1;
 
         // Initialize thread pool and database connection pool
-        ThreadPool threadPool(ncpus * 1.5);
-        DatabaseConnectionPool dbConnPool(ncpus * 2);
+        ThreadPool threadPool(ncpus * 3);
+        DatabaseConnectionPool dbConnPool(ncpus * 4);
 
         DatabaseHandler dbHandler(dbConnPool);
 
@@ -46,7 +46,8 @@ int main()
             });
 
         // Start the server on port 8080
-        // app.loglevel(crow::LogLevel::Critical);
+        std::cout << "database server is started.\n";
+        app.loglevel(crow::LogLevel::Critical);
         app.use_compression(crow::compression::algorithm::GZIP).port(8080).multithreaded().run();
     } catch (const std::exception& e) {
         std::cerr << "Exception caught in main: " << e.what() << std::endl;
