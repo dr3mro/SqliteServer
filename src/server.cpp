@@ -1,7 +1,6 @@
 #include "databaseconnectionpool.hpp"
 #include "databasehandler.hpp"
 #include "resthandler.hpp"
-#include "threadpool.hpp"
 #include <crow.h>
 #include <fmt/core.h>
 #include <memory.h>
@@ -12,13 +11,11 @@
 int main()
 {
     try {
-
+        // Get the number of cpu cores of CPU to define the number of threads for the server and threadpool
         unsigned int ncpus = std::thread::hardware_concurrency() ? std::thread::hardware_concurrency() : 1;
-
-        // Initialize thread pool and database connection pool
-        ThreadPool threadPool(ncpus * 2);
+        // initialize database connections pool
         DatabaseConnectionPool dbConnPool(ncpus * 3);
-
+        // create the db controller and handle it the connection
         DatabaseHandler dbHandler(dbConnPool);
 
         // Create REST handler
@@ -50,8 +47,7 @@ int main()
         CROW_CATCHALL_ROUTE(app)
         ([](crow::response& res) {
             res.code = crow::OK;
-            res.write("Welcome to ProjectValhalla Server.");
-            res.end();
+            res.end("Welcome to the ___ ASGARD ___.");
         });
 
         // Start the server on port 8080
