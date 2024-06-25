@@ -47,6 +47,13 @@ int main()
                 restHandler.delete_patient_basic_information(std::ref(req), std::ref(res), id);
             });
 
+        CROW_CATCHALL_ROUTE(app)
+        ([](crow::response& res) {
+            res.code = crow::OK;
+            res.write("Welcome to ProjectValhalla Server.");
+            res.end();
+        });
+
         // Start the server on port 8080
         std::cout << fmt::format("database server is started on port {}.\n", PORT);
         app.loglevel(crow::LogLevel::CRITICAL)
