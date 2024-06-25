@@ -26,7 +26,6 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
             }
 
             basic_data_json["id"] = nextid;
-
             // Construct SQL query using {fmt} for parameterized query
             std::string query
                 = fmt::format("INSERT INTO patients_basic_data (id, basic_data) VALUES ('{}','{}') RETURNING basic_data;",
@@ -44,8 +43,7 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
         }
     };
 
-    auto t = threadPool.enqueue(func);
-    t.wait(); // Wait for the task to complete
+    threadPool.enqueue(func).get();
 }
 
 void RestHandler::read_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
@@ -72,8 +70,7 @@ void RestHandler::read_patient_basic_information(const crow::request& req, crow:
         }
     };
 
-    auto t = threadPool.enqueue(func);
-    t.get(); // Wait for the task to complete
+    threadPool.enqueue(func).get();
 }
 
 void RestHandler::update_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
@@ -102,8 +99,7 @@ void RestHandler::update_patient_basic_information(const crow::request& req, cro
         }
     };
 
-    auto t = threadPool.enqueue(func);
-    t.wait(); // Wait for the task to complete
+    threadPool.enqueue(func).get();
 }
 void RestHandler::delete_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
 {
@@ -128,8 +124,7 @@ void RestHandler::delete_patient_basic_information(const crow::request& req, cro
         }
     };
 
-    auto t = threadPool.enqueue(func);
-    t.wait(); // Wait for the task to complete
+    threadPool.enqueue(func).get();
 }
 
 uint64_t RestHandler::get_next_patient_id()

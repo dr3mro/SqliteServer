@@ -14,8 +14,8 @@ int main()
         unsigned int ncpus = std::thread::hardware_concurrency() ? std::thread::hardware_concurrency() : 1;
 
         // Initialize thread pool and database connection pool
-        ThreadPool threadPool(ncpus * 3);
-        DatabaseConnectionPool dbConnPool(ncpus * 4);
+        ThreadPool threadPool(ncpus * 2);
+        DatabaseConnectionPool dbConnPool(ncpus * 3);
 
         DatabaseHandler dbHandler(dbConnPool);
 
@@ -32,7 +32,16 @@ int main()
         // GET route example: /get/<int>
         CROW_ROUTE(app, "/api_v1/read_patient_basic_information/<int>")
             .methods("GET"_method)([&restHandler](const crow::request& req, crow::response& res, uint64_t id) {
-                restHandler.read_patient_basic_information(req, res, id);
+                try {
+                    // Call the handler function with the request, response, and id
+                    restHandler.read_patient_basic_information(req, res, id);
+                } catch (const std::exception& e) {
+                    // Handle exceptions if necessary
+                    res.code = 500;
+                    res.write("Internal Server Error");
+                    res.end(); // Always end the response after handling
+                    std::cout << "Internal Server Error\n";
+                }
             });
 
         CROW_ROUTE(app, "/api_v1/update_patient_basic_information/<int>")
@@ -47,12 +56,13 @@ int main()
 
         // Start the server on port 8080
         std::cout << "database server is started.\n";
-        app
-            .loglevel(crow::LogLevel::Critical)
+        app.loglevel(crow::LogLevel::INFO)
             .use_compression(crow::compression::algorithm::GZIP)
             .port(8080)
-            .concurrency(32)
+            //.concurrency(ncpus * 4)
+            .bindaddr("127.0.0.1")
             .server_name("ProjectValhalla")
+            .multithreaded()
             .run();
     } catch (const std::exception& e) {
         std::cerr << "Exception caught in main: " << e.what() << std::endl;
