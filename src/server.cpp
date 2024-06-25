@@ -1,11 +1,13 @@
 #include "databaseconnectionpool.hpp"
+#include "databasehandler.hpp"
+#include "resthandler.hpp"
 #include "threadpool.hpp"
 #include <crow.h>
+#include <fmt/core.h>
 #include <memory.h>
 #include <thread>
 
-#include "databasehandler.hpp"
-#include "resthandler.hpp"
+#define PORT 8080
 
 int main()
 {
@@ -46,10 +48,10 @@ int main()
             });
 
         // Start the server on port 8080
-        std::cout << "database server is started.\n";
+        std::cout << fmt::format("database server is started on port {}.\n", PORT);
         app.loglevel(crow::LogLevel::WARNING)
             .use_compression(crow::compression::algorithm::GZIP)
-            .port(8080)
+            .port(PORT)
             .concurrency(ncpus * 4)
             .bindaddr("127.0.0.1")
             .server_name("ProjectValhalla")
