@@ -28,7 +28,7 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/postgres
     ports:
-      - "8080:8080"
+      - "18080:80"
 
 networks:
   valhalla_network:
