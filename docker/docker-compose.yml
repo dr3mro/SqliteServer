@@ -21,8 +21,6 @@ services:
     networks:
       docker_valhalla-network:
         ipv4_address: 172.20.0.2
-    ports:
-      - 8080:8080
     volumes:
       - src_data:/usr/src/
     depends_on:
