@@ -47,11 +47,11 @@ int main()
 
         // Start the server on port 8080
         std::cout << "database server is started.\n";
-        app.loglevel(crow::LogLevel::CRITICAL)
+        app.loglevel(crow::LogLevel::WARNING)
             .use_compression(crow::compression::algorithm::GZIP)
-            .port(18080)
-            //.concurrency(ncpus * 4)
-            //.bindaddr("127.0.0.1")
+            .port(8080)
+            .concurrency(ncpus * 2)
+            .bindaddr("127.0.0.1")
             .server_name("ProjectValhalla")
             .multithreaded()
             .run();
