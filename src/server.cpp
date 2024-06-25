@@ -49,7 +49,7 @@ int main()
 
         // Start the server on port 8080
         std::cout << fmt::format("database server is started on port {}.\n", PORT);
-        app.loglevel(crow::LogLevel::WARNING)
+        app.loglevel(crow::LogLevel::INFO)
             .use_compression(crow::compression::algorithm::GZIP)
             .port(PORT)
             .concurrency(ncpus * 4)
