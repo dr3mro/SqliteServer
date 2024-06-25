@@ -20,29 +20,29 @@ int main()
         DatabaseHandler dbHandler(dbConnPool);
 
         // Create REST handler
-        RestHandler restHandler(dbHandler, threadPool);
+        RestHandler restHandler(dbHandler);
 
         // Initialize Crow application
         crow::SimpleApp app;
 
         CROW_ROUTE(app, "/api_v1/create_patient_basic_information")
-            .methods("POST"_method)([&restHandler](const crow::request& req, crow::response& res) {
-                restHandler.create_patient_basic_information(req, res);
+            .methods("POST"_method)([&restHandler, &threadPool](const crow::request& req, crow::response& res) {
+                threadPool.enqueue(&RestHandler::create_patient_basic_information, restHandler, std::ref(req), std::ref(res)).get();
             });
         // GET route example: /get/<int>
         CROW_ROUTE(app, "/api_v1/read_patient_basic_information/<int>")
-            .methods("GET"_method)([&restHandler](const crow::request& req, crow::response& res, uint64_t id) {
-                auto t = std::async(std::launch::async, &RestHandler::read_patient_basic_information, &restHandler, std::ref(req), std::ref(res), id);
+            .methods("GET"_method)([&restHandler, &threadPool](const crow::request& req, crow::response& res, uint64_t id) {
+                threadPool.enqueue(&RestHandler::read_patient_basic_information, restHandler, std::ref(req), std::ref(res), id).get();
             });
 
         CROW_ROUTE(app, "/api_v1/update_patient_basic_information/<int>")
-            .methods("POST"_method)([&restHandler](const crow::request& req, crow::response& res, uint64_t id) {
-                restHandler.update_patient_basic_information(req, res, id);
+            .methods("POST"_method)([&restHandler, &threadPool](const crow::request& req, crow::response& res, uint64_t id) {
+                threadPool.enqueue(&RestHandler::update_patient_basic_information, restHandler, std::ref(req), std::ref(res), id).get();
             });
 
         CROW_ROUTE(app, "/api_v1/delete_patient_basic_information/<int>")
-            .methods("GET"_method)([&restHandler](const crow::request& req, crow::response& res, uint64_t id) {
-                restHandler.delete_patient_basic_information(req, res, id);
+            .methods("GET"_method)([&restHandler, &threadPool](const crow::request& req, crow::response& res, uint64_t id) {
+                threadPool.enqueue(&RestHandler::delete_patient_basic_information, restHandler, std::ref(req), std::ref(res), id).get();
             });
 
         // Start the server on port 8080

@@ -1,12 +1,11 @@
 #include "databasehandler.hpp"
-#include "threadpool.hpp"
 #include <crow.h>
 
 using json = nlohmann::json;
 
 class RestHandler {
 public:
-    RestHandler(DatabaseHandler& dbHandler, ThreadPool& threadPool);
+    RestHandler(DatabaseHandler& dbHandler);
 
     // CRUD
     void create_patient_basic_information(const crow::request& req, crow::response& res);
@@ -16,7 +15,6 @@ public:
 
 private:
     DatabaseHandler& dbHandler;
-    ThreadPool& threadPool;
 
     // assistive methods
     uint64_t get_next_patient_id();

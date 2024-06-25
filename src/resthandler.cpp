@@ -2,127 +2,109 @@
 #include <crow.h>
 #include <fmt/core.h> // Include fmt library for string formatting
 
-RestHandler::RestHandler(DatabaseHandler& dbHandler, ThreadPool& threadPool)
+RestHandler::RestHandler(DatabaseHandler& dbHandler)
     : dbHandler(dbHandler)
-    , threadPool(threadPool)
 {
 }
 
 void RestHandler::create_patient_basic_information(const crow::request& req, crow::response& res)
 {
-    auto func = [this, &res, &req]() {
-        json response_json;
+    json response_json;
 
-        auto basic_data_json = json::parse(req.body);
+    auto basic_data_json = json::parse(req.body);
 
-        try {
-            uint64_t nextid = get_next_patient_id();
+    try {
+        uint64_t nextid = get_next_patient_id();
 
-            if (nextid == 0) {
-                format_response(response_json, -1, "failed to create a new patient", "failed to get nextval");
-                return finish_response(res, 401, response_json.dump(4));
-            }
-
-            basic_data_json["id"] = nextid;
-            // Construct SQL query using {fmt} for parameterized query
-            std::string query
-                = fmt::format("INSERT INTO patients_basic_data (id, basic_data) VALUES ('{}','{}') RETURNING basic_data;",
-                    nextid, basic_data_json.dump());
-
-            // Execute the query using DatabaseHandler
-            json query_results_json = dbHandler.executeQuery(query);
-
-            evaluate_response(response_json, query_results_json);
-            return finish_response(res, 200, response_json.dump(4));
-        } catch (const std::exception& e) {
-            // Handle exception (log, etc.)
-            format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
-            return finish_response(res, 500, response_json.dump(4));
+        if (nextid == 0) {
+            format_response(response_json, -1, "failed to create a new patient", "failed to get nextval");
+            finish_response(res, 401, response_json.dump(4));
         }
-    };
 
-    threadPool.enqueue(func).get();
+        basic_data_json["id"] = nextid;
+        // Construct SQL query using {fmt} for parameterized query
+        std::string query
+            = fmt::format("INSERT INTO patients_basic_data (id, basic_data) VALUES ('{}','{}') RETURNING basic_data;",
+                nextid, basic_data_json.dump());
+
+        // Execute the query using DatabaseHandler
+        json query_results_json = dbHandler.executeQuery(query);
+
+        evaluate_response(response_json, query_results_json);
+        finish_response(res, 200, response_json.dump(4));
+    } catch (const std::exception& e) {
+        // Handle exception (log, etc.)
+        format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
+        finish_response(res, 500, response_json.dump(4));
+    }
 }
 
 void RestHandler::read_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
 {
-    auto func = [this, &req, &res, id]() {
-        (void)req;
-        json response_json;
-        try {
-            std::string query
-                = fmt::format("SELECT basic_data FROM patients_basic_data WHERE id = {}", id);
-            json query_results_json = dbHandler.executeReadQuery(query);
+    json response_json;
+    try {
+        std::string query
+            = fmt::format("SELECT basic_data FROM patients_basic_data WHERE id = {}", id);
+        json query_results_json = dbHandler.executeReadQuery(query);
 
-            if (query_results_json.empty()) {
-                format_response(response_json, -1, "not found", query_results_json);
-                return finish_response(res, 404, response_json.dump(4));
-            } else {
-                format_response(response_json, 0, "success", query_results_json);
-                return finish_response(res, 200, response_json.dump(4));
-            }
-        } catch (const std::exception& e) {
-            // Handle exception (log, etc.)
-            format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
-            return finish_response(res, 500, response_json.dump(4));
+        if (query_results_json.empty()) {
+            format_response(response_json, -1, "not found", query_results_json);
+            finish_response(res, 404, response_json.dump(4));
+        } else {
+            format_response(response_json, 0, "success", query_results_json);
+            finish_response(res, 200, response_json.dump(4));
         }
-    };
-
-    threadPool.enqueue(func).get();
+    } catch (const std::exception& e) {
+        // Handle exception (log, etc.)
+        format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
+        finish_response(res, 500, response_json.dump(4));
+    }
 }
 
 void RestHandler::update_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
 {
-    auto func = [this, &res, &req, id]() {
-        json response_json;
+    json response_json;
 
-        auto basic_data_json = json::parse(req.body);
+    auto basic_data_json = json::parse(req.body);
 
-        try {
-            // Construct SQL query using {fmt} for parameterized query
-            std::string query
-                = fmt::format("UPDATE patients_basic_data SET basic_data = '{}' WHERE id = '{}' RETURNING basic_data;",
-                    basic_data_json.dump(), id);
+    try {
+        // Construct SQL query using {fmt} for parameterized query
+        std::string query
+            = fmt::format("UPDATE patients_basic_data SET basic_data = '{}' WHERE id = '{}' RETURNING basic_data;",
+                basic_data_json.dump(), id);
 
-            // Execute the query using DatabaseHandler
-            json query_results_json = dbHandler.executeQuery(query);
+        // Execute the query using DatabaseHandler
+        json query_results_json = dbHandler.executeQuery(query);
 
-            evaluate_response(response_json, query_results_json);
-            return finish_response(res, 200, response_json.dump(4));
+        evaluate_response(response_json, query_results_json);
+        finish_response(res, 200, response_json.dump(4));
 
-        } catch (const std::exception& e) {
-            // Handle exception (log, etc.)
-            format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
-            return finish_response(res, 500, response_json.dump(4));
-        }
-    };
-
-    threadPool.enqueue(func).get();
+    } catch (const std::exception& e) {
+        // Handle exception (log, etc.)
+        format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
+        finish_response(res, 500, response_json.dump(4));
+    }
 }
 void RestHandler::delete_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
 {
-    auto func = [this, &req, &res, id]() {
-        (void)req;
-        json response_json;
 
-        try {
-            // Construct SQL query using {fmt} for parameterized query
-            std::string query = fmt::format("DELETE FROM patients_basic_data WHERE id={};", id);
+    json response_json;
 
-            // Execute the query using DatabaseHandler
-            json query_results_json = dbHandler.executeQuery(query);
+    try {
+        // Construct SQL query using {fmt} for parameterized query
+        std::string query = fmt::format("DELETE FROM patients_basic_data WHERE id={};", id);
 
-            evaluate_response(response_json, query_results_json);
-            return finish_response(res, 200, response_json.dump(4));
+        // Execute the query using DatabaseHandler
+        json query_results_json = dbHandler.executeQuery(query);
 
-        } catch (const std::exception& e) {
-            // Handle exception (log, etc.)
-            format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
-            return finish_response(res, 500, response_json.dump(4));
-        }
-    };
+        evaluate_response(response_json, query_results_json);
+        finish_response(res, 200, response_json.dump(4));
 
-    threadPool.enqueue(func).get();
+    } catch (const std::exception& e) {
+        // Handle exception (log, etc.)
+        format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
+        finish_response(res, 500, response_json.dump(4));
+    }
 }
 
 uint64_t RestHandler::get_next_patient_id()
