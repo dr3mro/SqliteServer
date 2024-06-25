@@ -7,7 +7,7 @@
 #include <memory.h>
 #include <thread>
 
-#define PORT 8080
+#define PORT 18080
 
 int main()
 {

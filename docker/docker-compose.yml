@@ -8,7 +8,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
-      docker_valhalla-network:
+      valhalla_network:
         ipv4_address: 172.20.0.3
     environment:
       POSTGRES_USER: postgres
@@ -19,7 +19,7 @@ services:
       context: .
       dockerfile: dockerfile.api
     networks:
-      docker_valhalla-network:
+      valhalla_network:
         ipv4_address: 172.20.0.2
     volumes:
       - src_data:/usr/src/
@@ -31,7 +31,7 @@ services:
       - "8080:8080"
 
 networks:
-  docker_valhalla-network:
+  valhalla_network:
     driver: bridge
     ipam:
       config:
