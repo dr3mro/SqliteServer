@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+#set -e
 
 # Clone the repository if it doesn't exist
 if [ ! -d .git ]; then
