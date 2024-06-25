@@ -55,7 +55,7 @@ int main()
             .concurrency(ncpus * 4)
             .bindaddr("0.0.0.0")
             .server_name("ProjectValhalla")
-            .multithreaded()
+            //.multithreaded()
             .run();
     } catch (const std::exception& e) {
         std::cerr << "Exception caught in main: " << e.what() << std::endl;
