@@ -48,29 +48,29 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
 
 void RestHandler::read_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
 {
-    auto func = [this, &req, &res, id]() {
-        (void)req;
-        json response_json;
-        try {
-            std::string query
-                = fmt::format("SELECT basic_data FROM patients_basic_data WHERE id = {}", id);
-            json query_results_json = dbHandler.executeReadQuery(query);
+    // auto func = [this, &req, &res, id]() {
+    (void)req;
+    json response_json;
+    try {
+        std::string query
+            = fmt::format("SELECT basic_data FROM patients_basic_data WHERE id = {}", id);
+        json query_results_json = dbHandler.executeReadQuery(query);
 
-            if (query_results_json.empty()) {
-                format_response(response_json, -1, "not found", query_results_json);
-                return finish_response(res, 404, response_json.dump(4));
-            } else {
-                format_response(response_json, 0, "success", query_results_json);
-                return finish_response(res, 200, response_json.dump(4));
-            }
-        } catch (const std::exception& e) {
-            // Handle exception (log, etc.)
-            format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
-            return finish_response(res, 500, response_json.dump(4));
+        if (query_results_json.empty()) {
+            format_response(response_json, -1, "not found", query_results_json);
+            return finish_response(res, 404, response_json.dump(4));
+        } else {
+            format_response(response_json, 0, "success", query_results_json);
+            return finish_response(res, 200, response_json.dump(4));
         }
-    };
+    } catch (const std::exception& e) {
+        // Handle exception (log, etc.)
+        format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
+        return finish_response(res, 500, response_json.dump(4));
+    }
+    //};
 
-    threadPool.enqueue(func).get();
+    // threadPool.enqueue(func).get();
 }
 
 void RestHandler::update_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)

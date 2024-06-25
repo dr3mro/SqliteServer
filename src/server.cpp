@@ -32,16 +32,7 @@ int main()
         // GET route example: /get/<int>
         CROW_ROUTE(app, "/api_v1/read_patient_basic_information/<int>")
             .methods("GET"_method)([&restHandler](const crow::request& req, crow::response& res, uint64_t id) {
-                try {
-                    // Call the handler function with the request, response, and id
-                    restHandler.read_patient_basic_information(req, res, id);
-                } catch (const std::exception& e) {
-                    // Handle exceptions if necessary
-                    res.code = 500;
-                    res.write("Internal Server Error");
-                    res.end(); // Always end the response after handling
-                    std::cout << "Internal Server Error\n";
-                }
+                auto t = std::async(std::launch::async, &RestHandler::read_patient_basic_information, &restHandler, std::ref(req), std::ref(res), id);
             });
 
         CROW_ROUTE(app, "/api_v1/update_patient_basic_information/<int>")
@@ -56,11 +47,11 @@ int main()
 
         // Start the server on port 8080
         std::cout << "database server is started.\n";
-        app.loglevel(crow::LogLevel::INFO)
+        app.loglevel(crow::LogLevel::CRITICAL)
             .use_compression(crow::compression::algorithm::GZIP)
-            .port(8080)
+            .port(18080)
             //.concurrency(ncpus * 4)
-            .bindaddr("127.0.0.1")
+            //.bindaddr("127.0.0.1")
             .server_name("ProjectValhalla")
             .multithreaded()
             .run();
