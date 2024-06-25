@@ -26,6 +26,8 @@ services:
       - db
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+    ports:
+      - "8080:8080"
 
 networks:
   docker_valhalla-network:
