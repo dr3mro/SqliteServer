@@ -3,15 +3,15 @@
 docker network create valhalla-network
 docker-compose up --build
 
-curl -X POST -H "Content-Type: application/json" -d @dummy_patient.json http://172.20.0.2:8080/api_v1/create_patient_basic_information -i
-curl -X POST -H "Content-Type: application/json" -d @dummy_patient2.json http://172.20.0.2:8080/api_v1/create_patient_basic_information -i
-curl -X POST -H "Content-Type: application/json" -d @dummy_patient3.json http://172.20.0.2:8080/api_v1/create_patient_basic_information -i
-curl -X POST -H "Content-Type: application/json" -d @dummy_patient4.json http://172.20.0.2:8080/api_v1/create_patient_basic_information -i
+curl -X POST -H "Content-Type: application/json" -d @dummy_patient.json http://localhost:8080/api_v1/create_patient_basic_information -i
+curl -X POST -H "Content-Type: application/json" -d @dummy_patient2.json http://localhost:8080/api_v1/create_patient_basic_information -i
+curl -X POST -H "Content-Type: application/json" -d @dummy_patient3.json http://localhost:8080/api_v1/create_patient_basic_information -i
+curl -X POST -H "Content-Type: application/json" -d @dummy_patient4.json http://localhost:8080/api_v1/create_patient_basic_information -i
 
-curl 172.20.0.2:8080/api_v1/read_patient_basic_information/100000
-curl 172.20.0.2:8080/api_v1/read_patient_basic_information/100001
-curl 172.20.0.2:8080/api_v1/read_patient_basic_information/100002
-curl 172.20.0.2:8080/api_v1/read_patient_basic_information/100003
+curl localhost:8080/api_v1/read_patient_basic_information/100000
+curl localhost:8080/api_v1/read_patient_basic_information/100001
+curl localhost:8080/api_v1/read_patient_basic_information/100002
+curl localhost:8080/api_v1/read_patient_basic_information/100003
 
 psql -U postgres -d postgres -h 172.20.0.3
 

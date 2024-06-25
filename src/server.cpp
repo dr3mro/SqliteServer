@@ -53,7 +53,7 @@ int main()
             .use_compression(crow::compression::algorithm::GZIP)
             .port(PORT)
             .concurrency(ncpus * 4)
-            .bindaddr("127.0.0.1")
+            .bindaddr("0.0.0.0")
             .server_name("ProjectValhalla")
             .multithreaded()
             .run();
