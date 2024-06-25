@@ -14,4 +14,4 @@ cmake -GNinja .
 ninja
 
 # Execute the server
-./server
+exec ./server
