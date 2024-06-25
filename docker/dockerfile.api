@@ -18,9 +18,8 @@ WORKDIR /usr/src/ProjectValhalla
 RUN git clone https://github.com/dr3mro/ProjectValhalla.git /usr/src/ProjectValhalla/
 RUN chmod +x /usr/src/ProjectValhalla/docker/entrypoint.sh
 
-# Expose port 8080
-EXPOSE 8080
-
 # Use the entrypoint script as the default command
 ENTRYPOINT ["/usr/src/ProjectValhalla/docker/entrypoint.sh"]
 
+# Expose port 8080
+EXPOSE 8080
