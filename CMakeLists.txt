@@ -19,6 +19,7 @@ CPMAddPackage("gh:jtv/libpqxx#7.9.1")
 CPMAddPackage("gh:jbeder/yaml-cpp#0.8.0")
 CPMAddPackage("gh:danielaparker/jsoncons#v0.176.0")
 CPMAddPackage("gh:Thalhammer/jwt-cpp#v0.7.0")
+CPMAddPackage("gh:okdshin/PicoSHA2#v1.0.0")
 
 file (GLOB_RECURSE SRC "src/*.cpp" )
 
@@ -34,6 +35,7 @@ target_include_directories(${Target}
                         "${yaml-cpp_SOURCE_DIR}/src"
                         "${jsoncons_SOURCE_DIR}/include"
                         "${jwt-cpp_SOURCE_DIR}/src"
+                        "${PicoSHA2_SOURCE_DIR}"
                         )
 
 target_compile_definitions(${Target}  PUBLIC CROW_ENABLE_COMPRESSION)

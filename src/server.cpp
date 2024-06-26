@@ -27,8 +27,7 @@ int main()
         ////////////////
         CROW_ROUTE(app, "/v1/register")
             .methods("POST"_method)([&restHandler](const crow::request& req, crow::response& res) {
-                // here we implement code to add users to the users database with role set to be used later for authentcation
-                // and autherization
+                restHandler.register_user(std::ref(req), std::ref(res));
             });
 
         CROW_ROUTE(app, "/v1/authenticate")
