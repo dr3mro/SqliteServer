@@ -113,10 +113,10 @@ int main()
         app.loglevel(crow::LogLevel::CRITICAL)
             .use_compression(crow::compression::algorithm::GZIP)
             .port(PORT)
+            .multithreaded()
             .concurrency(ncpus * 4)
             .bindaddr("0.0.0.0")
             .server_name("ProjectValhalla")
-            //.multithreaded()
             .run();
     } catch (const std::exception& e) {
         std::cerr << "Exception caught in main: " << e.what() << std::endl;
