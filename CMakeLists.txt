@@ -11,8 +11,6 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" )
 include(CPM)
 
-
-#CPMAddPackage("gh:nlohmann/json#v3.11.3")
 CPMAddPackage("gh:fmtlib/fmt#10.2.1")
 CPMAddPackage("gh:chriskohlhoff/asio#asio-1-30-2")
 CPMAddPackage("gh:madler/zlib#v1.3.1")
@@ -22,16 +20,12 @@ CPMAddPackage("gh:jbeder/yaml-cpp#0.8.0")
 CPMAddPackage("gh:danielaparker/jsoncons#v0.176.0")
 CPMAddPackage("gh:Thalhammer/jwt-cpp#v0.7.0")
 
-
 file (GLOB_RECURSE SRC "src/*.cpp" )
 
 add_executable(${Target} ${SRC})
 
-
-
 target_include_directories(${Target}
                         PRIVATE
-                        #"${json_SOURCE_DIR}/include"
                         "${fmt_SOURCE_DIR}/include"
                         "${zlib_SOURCE_DIR}/",
                         "${crow_SOURCE_DIR}/include"

@@ -11,8 +11,6 @@ RestHandler::RestHandler(DatabaseHandler& dbHandler)
 void RestHandler::create_patient_basic_information(const crow::request& req, crow::response& res)
 {
     json response_json;
-    std::string response_pretty;
-
     auto basic_data_json = json::parse(req.body);
 
     try {
@@ -20,8 +18,7 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
 
         if (nextid == 0) {
             format_response(response_json, -1, "failed to create a new patient", "failed to get nextval");
-            response_json.dump(response_pretty, jsoncons::indenting::indent);
-            finish_response(res, 401, response_pretty);
+            finish_response(res, 401, response_json);
         }
 
         basic_data_json["id"] = nextid;
@@ -32,15 +29,12 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
 
         // Execute the query using DatabaseHandler
         json query_results_json = dbHandler.executeQuery(query);
-
         evaluate_response(response_json, query_results_json);
-        response_json.dump(response_pretty, jsoncons::indenting::indent);
-        finish_response(res, 200, response_pretty);
+        finish_response(res, 200, response_json);
     } catch (const std::exception& e) {
         // Handle exception (log, etc.)
         format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
-        response_json.dump(response_pretty, jsoncons::indenting::indent);
-        finish_response(res, 500, response_pretty);
+        finish_response(res, 500, response_json);
     }
 }
 
@@ -54,15 +48,15 @@ void RestHandler::read_patient_basic_information(const crow::request& req, crow:
 
         if (query_results_json.empty()) {
             format_response(response_json, -1, "not found", query_results_json);
-            finish_response(res, 404, response_json.to_string());
+            finish_response(res, 404, response_json);
         } else {
             format_response(response_json, 0, "success", query_results_json);
-            finish_response(res, 200, response_json.to_string());
+            finish_response(res, 200, response_json);
         }
     } catch (const std::exception& e) {
         // Handle exception (log, etc.)
         format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
-        finish_response(res, 500, response_json.to_string());
+        finish_response(res, 500, response_json);
     }
 }
 
@@ -82,12 +76,12 @@ void RestHandler::update_patient_basic_information(const crow::request& req, cro
         json query_results_json = dbHandler.executeQuery(query);
 
         evaluate_response(response_json, query_results_json);
-        finish_response(res, 200, response_json.to_string());
+        finish_response(res, 200, response_json);
 
     } catch (const std::exception& e) {
         // Handle exception (log, etc.)
         format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
-        finish_response(res, 500, response_json.to_string());
+        finish_response(res, 500, response_json);
     }
 }
 void RestHandler::delete_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
@@ -103,12 +97,12 @@ void RestHandler::delete_patient_basic_information(const crow::request& req, cro
         json query_results_json = dbHandler.executeQuery(query);
 
         evaluate_response(response_json, query_results_json);
-        finish_response(res, 200, response_json.to_string());
+        finish_response(res, 200, response_json);
 
     } catch (const std::exception& e) {
         // Handle exception (log, etc.)
         format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
-        finish_response(res, 500, response_json.to_string());
+        finish_response(res, 500, response_json);
     }
 }
 
@@ -148,8 +142,10 @@ void RestHandler::format_response(json& response_json, const short status, const
     response_json["response"] = response;
 }
 
-void RestHandler::finish_response(crow::response& res, const int& code, const std::string& body)
+void RestHandler::finish_response(crow::response& res, const int& code, const json& response_json)
 {
+    std::string body;
+    response_json.dump(body, jsoncons::indenting::indent);
     res.code = code;
     res.write(body);
     res.end();
