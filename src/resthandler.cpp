@@ -11,6 +11,7 @@ RestHandler::RestHandler(DatabaseHandler& dbHandler)
 void RestHandler::create_patient_basic_information(const crow::request& req, crow::response& res)
 {
     json response_json;
+    std::string response_pretty;
 
     auto basic_data_json = json::parse(req.body);
 
@@ -19,7 +20,8 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
 
         if (nextid == 0) {
             format_response(response_json, -1, "failed to create a new patient", "failed to get nextval");
-            finish_response(res, 401, response_json.to_string());
+            response_json.dump(response_pretty, jsoncons::indenting::indent);
+            finish_response(res, 401, response_pretty);
         }
 
         basic_data_json["id"] = nextid;
@@ -32,11 +34,13 @@ void RestHandler::create_patient_basic_information(const crow::request& req, cro
         json query_results_json = dbHandler.executeQuery(query);
 
         evaluate_response(response_json, query_results_json);
-        finish_response(res, 200, response_json.to_string());
+        response_json.dump(response_pretty, jsoncons::indenting::indent);
+        finish_response(res, 200, response_pretty);
     } catch (const std::exception& e) {
         // Handle exception (log, etc.)
         format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
-        finish_response(res, 500, response_json.to_string());
+        response_json.dump(response_pretty, jsoncons::indenting::indent);
+        finish_response(res, 500, response_pretty);
     }
 }
 
