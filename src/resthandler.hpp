@@ -1,7 +1,7 @@
 #include "databasehandler.hpp"
 #include <crow.h>
 
-using json = nlohmann::json;
+using json = jsoncons::json;
 
 class RestHandler {
 public:
@@ -15,6 +15,8 @@ public:
 
 private:
     DatabaseHandler& dbHandler;
+    // Configure JSON serialization options
+    jsoncons::json_options options;
 
     // assistive methods
     uint64_t get_next_patient_id();

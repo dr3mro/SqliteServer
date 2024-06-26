@@ -1,10 +1,10 @@
 #ifndef DATABASE_HPP
 #define DATABASE_HPP
 
-#include <nlohmann/json.hpp>
+#include <jsoncons/json.hpp>
 #include <pqxx/pqxx> // Include the libpqxx header for PostgreSQL
 
-using json = nlohmann::json;
+using json = jsoncons::json;
 
 class Database {
 public:

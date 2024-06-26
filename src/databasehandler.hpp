@@ -2,9 +2,9 @@
 
 #include "database.hpp"
 #include "databaseconnectionpool.hpp"
-#include <nlohmann/json.hpp>
+#include <jsoncons/json.hpp>
 
-using json = nlohmann::json;
+using json = jsoncons::json;
 
 class DatabaseHandler {
 public:
