@@ -2,7 +2,7 @@
 #include <crow.h>
 #include <fmt/core.h> // Include fmt library for string formatting
 #include <picosha2.h>
-
+#include <regex>
 RestHandler::RestHandler(DatabaseHandler& dbHandler)
     : dbHandler(dbHandler)
 {
@@ -128,18 +128,28 @@ void RestHandler::register_user(const crow::request& req, crow::response& res)
         std::string password_hash = picosha2::hash256_hex_string(password);
         std::string role = userdata_json["role"].as<std::string>();
         std::string user_data = userdata_json["user_data"].as<std::string>();
+        std::string email = userdata_json["user_data"]["contact"]["email"].as<std::string>();
         // check if user exists
         if (dbHandler.checkItemExists("users", "username", username)) {
             format_response(response_json, -1, "failed to create a new user, user exists", "user already exists");
             finish_response(res, 402, response_json);
             return;
         }
-        // check if username or password or email are valid
+        // check if username or password or email are empty
         if (username.empty() || password.empty() || password_hash.empty()) {
             format_response(response_json, -1, "failed to create a new user, invalid data", "empty username or password");
             finish_response(res, 403, response_json);
             return;
         }
+
+        // Check if the email matches the pattern
+        std::regex pattern(R"((\w+)(\.\w+)*@(\w+)(\.\w+)+)");
+        if (!std::regex_match(email, pattern)) {
+            format_response(response_json, -1, "failed to create a new user, invalid data", "invalid email format");
+            finish_response(res, 403, response_json);
+            return;
+        }
+
         //  Construct SQL query using {fmt} for parameterized query
         std::string query
             = fmt::format("INSERT INTO users (username, password_hash, role, user_data) VALUES ('{}','{}','{}','{}') ",
