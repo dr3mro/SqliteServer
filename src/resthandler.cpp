@@ -3,6 +3,7 @@
 #include <fmt/core.h> // Include fmt library for string formatting
 #include <picosha2.h>
 #include <regex>
+
 RestHandler::RestHandler(DatabaseHandler& dbHandler)
     : dbHandler(dbHandler)
 {
@@ -123,12 +124,34 @@ void RestHandler::register_user(const crow::request& req, crow::response& res)
     try {
         auto userdata_json = json::parse(req.body);
 
-        std::string username = userdata_json["name"].as<std::string>();
+        std::string username = userdata_json["username"].as<std::string>();
+        userdata_json.erase("username");
         std::string password = userdata_json["password"].as<std::string>();
+
+        // Define the regex pattern for a valid password
+        const std::regex password_pattern("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,}$");
+
+        // Check if the password matches the pattern
+        if (!std::regex_match(password, password_pattern)) {
+            format_response(response_json, -1, "failed to create a new user, invalid password", "password in weak");
+            finish_response(res, 402, response_json);
+            return;
+        }
+
+        userdata_json.erase("password");
         std::string password_hash = picosha2::hash256_hex_string(password);
         std::string role = userdata_json["role"].as<std::string>();
         std::string user_data = userdata_json["user_data"].as<std::string>();
         std::string email = userdata_json["user_data"]["contact"]["email"].as<std::string>();
+
+        // check if username contains spaces
+        std::regex space_pattern("\\s");
+        if (std::regex_search(username, space_pattern)) {
+            format_response(response_json, -1, "failed to create a new user, username contains spaces", "username contains spaces");
+            finish_response(res, 402, response_json);
+            return;
+        }
+
         // check if user exists
         if (dbHandler.checkItemExists("users", "username", username)) {
             format_response(response_json, -1, "failed to create a new user, user exists", "user already exists");
@@ -143,8 +166,8 @@ void RestHandler::register_user(const crow::request& req, crow::response& res)
         }
 
         // Check if the email matches the pattern
-        std::regex pattern(R"((\w+)(\.\w+)*@(\w+)(\.\w+)+)");
-        if (!std::regex_match(email, pattern)) {
+        std::regex email_pattern(R"((\w+)(\.\w+)*@(\w+)(\.\w+)+)");
+        if (!std::regex_match(email, email_pattern)) {
             format_response(response_json, -1, "failed to create a new user, invalid data", "invalid email format");
             finish_response(res, 403, response_json);
             return;
