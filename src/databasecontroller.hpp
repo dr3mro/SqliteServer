@@ -6,10 +6,10 @@
 
 using json = jsoncons::json;
 
-class DatabaseHandler {
+class DatabaseController {
 public:
-    DatabaseHandler(DatabaseConnectionPool& dbConnPool);
-    ~DatabaseHandler() = default;
+    DatabaseController(DatabaseConnectionPool& dbConnPool);
+    ~DatabaseController() = default;
     json executeQuery(const std::string& query);
     json executeReadQuery(const std::string& query);
     bool checkItemExists(const std::string& table, const std::string& column, const std::string& value);

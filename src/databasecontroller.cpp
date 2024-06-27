@@ -1,12 +1,12 @@
-#include "databasehandler.hpp"
+#include "databasecontroller.hpp"
 #include <iostream>
 
-DatabaseHandler::DatabaseHandler(DatabaseConnectionPool& dbConnPool)
+DatabaseController::DatabaseController(DatabaseConnectionPool& dbConnPool)
     : databaseConnectionPool(dbConnPool)
 {
 }
 
-json DatabaseHandler::executeQuery(const std::string& query)
+json DatabaseController::executeQuery(const std::string& query)
 {
     std::shared_ptr<Database> db = nullptr;
     try {
@@ -26,7 +26,7 @@ json DatabaseHandler::executeQuery(const std::string& query)
     return json(); // Return empty JSON object on failure (if no rethrow)
 }
 
-json DatabaseHandler::executeReadQuery(const std::string& query)
+json DatabaseController::executeReadQuery(const std::string& query)
 {
     std::shared_ptr<Database> db = nullptr;
     try {
@@ -46,7 +46,7 @@ json DatabaseHandler::executeReadQuery(const std::string& query)
     return json(); // Return empty JSON object on failure (if no rethrow)
 }
 
-bool DatabaseHandler::checkItemExists(const std::string& table, const std::string& column, const std::string& value)
+bool DatabaseController::checkItemExists(const std::string& table, const std::string& column, const std::string& value)
 {
     std::shared_ptr<Database> db = nullptr;
     try {
