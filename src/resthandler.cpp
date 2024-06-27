@@ -110,21 +110,36 @@ void RestHandler::delete_patient_basic_information(const crow::request& req, cro
 void RestHandler::register_user(const crow::request& req, crow::response& res)
 {
     json response_json;
-
+    // try to parse json and throw error if invalid json
     try {
         auto userdata_json = json::parse(req.body);
+    } catch (const std::exception& e) {
+        format_response(response_json, -1, "failed to create a new user, invalid json", fmt::format("error parsing user data: {}", e.what()));
+        finish_response(res, 401, response_json);
+        return;
+        ;
+    }
+    // parse the json and extract the data
+    try {
+        auto userdata_json = json::parse(req.body);
+
         std::string username = userdata_json["name"].as<std::string>();
         std::string password = userdata_json["password"].as<std::string>();
         std::string password_hash = picosha2::hash256_hex_string(password);
         std::string role = userdata_json["role"].as<std::string>();
         std::string user_data = userdata_json["user_data"].as<std::string>();
-
+        // check if user exists
         if (dbHandler.checkItemExists("users", "username", username)) {
             format_response(response_json, -1, "failed to create a new user, user exists", "user already exists");
-            finish_response(res, 401, response_json);
+            finish_response(res, 402, response_json);
             return;
         }
-
+        // check if username or password or email are valid
+        if (username.empty() || password.empty() || password_hash.empty()) {
+            format_response(response_json, -1, "failed to create a new user, invalid data", "empty username or password");
+            finish_response(res, 403, response_json);
+            return;
+        }
         //  Construct SQL query using {fmt} for parameterized query
         std::string query
             = fmt::format("INSERT INTO users (username, password_hash, role, user_data) VALUES ('{}','{}','{}','{}') ",
