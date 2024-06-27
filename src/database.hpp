@@ -14,6 +14,7 @@ public:
     bool isConnected();
     json executeQuery(const std::string& query);
     json executeReadQuery(const std::string& query);
+    bool checkExists(const std::string& table, const std::string& column, const std::string& value);
 
 private:
     std::shared_ptr<pqxx::connection> connection;

@@ -12,6 +12,7 @@ public:
     ~DatabaseHandler() = default;
     json executeQuery(const std::string& query);
     json executeReadQuery(const std::string& query);
+    bool checkItemExists(const std::string& table, const std::string& column, const std::string& value);
 
 private:
     DatabaseConnectionPool& databaseConnectionPool;

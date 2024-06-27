@@ -1,6 +1,6 @@
 #include "database.hpp"
+#include <fmt/core.h>
 #include <iostream>
-
 Database::Database(std::shared_ptr<pqxx::connection> conn)
     : connection(conn)
 {
@@ -61,6 +61,18 @@ json Database::executeReadQuery(const std::string& query) // this query has no c
         }
 
         return json_array;
+    } catch (const std::exception& e) {
+        std::cerr << "Error executing query: " << e.what() << std::endl;
+        throw; // Rethrow the exception to indicate failure
+    }
+}
+
+bool Database::checkExists(const std::string& table, const std::string& column, const std::string& value)
+{
+    try {
+        pqxx::nontransaction txn(*connection);
+        pqxx::result result = txn.exec(fmt::format("SELECT EXISTS ( SELECT 1 FROM {} WHERE {} = '{}');", table, column, value));
+        return result[0][0].as<bool>();
     } catch (const std::exception& e) {
         std::cerr << "Error executing query: " << e.what() << std::endl;
         throw; // Rethrow the exception to indicate failure

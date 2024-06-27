@@ -119,9 +119,16 @@ void RestHandler::register_user(const crow::request& req, crow::response& res)
         std::string role = userdata_json["role"].as<std::string>();
         std::string user_data = userdata_json["user_data"].as<std::string>();
 
-        // Construct SQL query using {fmt} for parameterized query
-        std::string query = fmt::format("INSERT INTO users (username, password_hash, role, user_data) VALUES ('{}','{}','{}','{}') ",
-            username, password_hash, role, user_data);
+        if (dbHandler.checkItemExists("users", "username", username)) {
+            format_response(response_json, -1, "failed to create a new user, user exists", "user already exists");
+            finish_response(res, 401, response_json);
+            return;
+        }
+
+        //  Construct SQL query using {fmt} for parameterized query
+        std::string query
+            = fmt::format("INSERT INTO users (username, password_hash, role, user_data) VALUES ('{}','{}','{}','{}') ",
+                username, password_hash, role, user_data);
 
         // Execute the query using DatabaseHandler
         json query_results_json = dbHandler.executeQuery(query);
