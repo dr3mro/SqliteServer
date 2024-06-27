@@ -1,7 +1,8 @@
 #include "databaseconnectionpool.hpp"
 #include "databasecontroller.hpp"
-#include "restcontroller.hpp"
+#include "patientcontroller.hpp"
 #include "resthelper.hpp"
+#include "usercontroller.hpp"
 #include <crow.h>
 #include <fmt/core.h>
 #include <memory.h>
@@ -24,33 +25,36 @@ int main()
         // Create REST helper
         RestHelper restHelper(dbController);
 
-        // Create REST handler
-        RestController restController(dbController, restHelper);
+        // Create Patient Controller
+        PatientController patientController(dbController, restHelper);
+
+        // Create User Controller
+        UserController userController(dbController, restHelper);
 
         // Initialize Crow application
         crow::SimpleApp app;
 
         ////////////////   ROUTES   ////////////////////
         CROW_ROUTE(app, "/v1/register")
-            .methods("POST"_method)([&restController](const crow::request& req, crow::response& res) {
-                restController.register_user(std::ref(req), std::ref(res));
+            .methods("POST"_method)([&userController](const crow::request& req, crow::response& res) {
+                userController.register_user(std::ref(req), std::ref(res));
             });
 
         CROW_ROUTE(app, "/v1/authenticate")
-            .methods("POST"_method)([&restController](const crow::request& req, crow::response& res) {
+            .methods("POST"_method)([&patientController](const crow::request& req, crow::response& res) {
                 // here we implement code to check login credenials and create token to be used during the next requests
                 // it well get user and password in header and return a token that will be stored in the database for later use
             });
 
         CROW_ROUTE(app, "/v1/retrieve")
-            .methods("GET"_method)([&restController](const crow::request& req, crow::response& res) {
+            .methods("GET"_method)([&patientController](const crow::request& req, crow::response& res) {
                 // here we will check the header for token and if valid the check for a variable that specify
                 // the column and the id needed and it will be returned as json list of data from database
                 //
             });
 
         CROW_ROUTE(app, "/v1/store")
-            .methods("POST"_method)([&restController](const crow::request& req, crow::response& res) {
+            .methods("POST"_method)([&patientController](const crow::request& req, crow::response& res) {
                 // here we will check the header for token and if valid the check for a variable that specify
                 // the operation either create or update then we check if the id exsists and check the column and
                 // the id needed and it will be store the json list of data into database and if the variable = delete
@@ -58,7 +62,7 @@ int main()
                 //
             });
         CROW_ROUTE(app, "/v1/store")
-            .methods("PUT"_method)([&restController](const crow::request& req, crow::response& res) {
+            .methods("PUT"_method)([&patientController](const crow::request& req, crow::response& res) {
                 // here we will check the header for token and if valid the check for a variable that specify
                 // the operation either create or update then we check if the id exsists and check the column and
                 // the id needed and it will be store the json list of data into database and if the variable = delete
@@ -67,7 +71,7 @@ int main()
             });
 
         CROW_ROUTE(app, "/v1/store")
-            .methods("DELETE"_method)([&restController](const crow::request& req, crow::response& res) {
+            .methods("DELETE"_method)([&patientController](const crow::request& req, crow::response& res) {
                 // here we will check the header for token and if valid the check for a variable that specify
                 // the operation either create or update then we check if the id exsists and check the column and
                 // the id needed and it will be store the json list of data into database and if the variable = delete
@@ -76,7 +80,7 @@ int main()
             });
 
         CROW_ROUTE(app, "/v1/search")
-            .methods("GET"_method)([&restController](const crow::request& req, crow::response& res) {
+            .methods("GET"_method)([&patientController](const crow::request& req, crow::response& res) {
                 // here we will check the header for token and if valid the check for a query string in the database and return
                 // list of results as json .. it will be expensive
             });
@@ -84,23 +88,23 @@ int main()
         ///////////////
 
         CROW_ROUTE(app, "/api_v1/create_patient_basic_information")
-            .methods("POST"_method)([&restController](const crow::request& req, crow::response& res) {
-                restController.create_patient_basic_information(std::ref(req), std::ref(res));
+            .methods("POST"_method)([&patientController](const crow::request& req, crow::response& res) {
+                patientController.create_patient_basic_information(std::ref(req), std::ref(res));
             });
         // GET route example: /get/<int>
         CROW_ROUTE(app, "/api_v1/read_patient_basic_information/<int>")
-            .methods("GET"_method)([&restController](const crow::request& req, crow::response& res, uint64_t id) {
-                restController.read_patient_basic_information(std::ref(req), std::ref(res), id);
+            .methods("GET"_method)([&patientController](const crow::request& req, crow::response& res, uint64_t id) {
+                patientController.read_patient_basic_information(std::ref(req), std::ref(res), id);
             });
 
         CROW_ROUTE(app, "/api_v1/update_patient_basic_information/<int>")
-            .methods("POST"_method)([&restController](const crow::request& req, crow::response& res, uint64_t id) {
-                restController.update_patient_basic_information(std::ref(req), std::ref(res), id);
+            .methods("POST"_method)([&patientController](const crow::request& req, crow::response& res, uint64_t id) {
+                patientController.update_patient_basic_information(std::ref(req), std::ref(res), id);
             });
 
         CROW_ROUTE(app, "/api_v1/delete_patient_basic_information/<int>")
-            .methods("GET"_method)([&restController](const crow::request& req, crow::response& res, uint64_t id) {
-                restController.delete_patient_basic_information(std::ref(req), std::ref(res), id);
+            .methods("GET"_method)([&patientController](const crow::request& req, crow::response& res, uint64_t id) {
+                patientController.delete_patient_basic_information(std::ref(req), std::ref(res), id);
             });
 
         CROW_CATCHALL_ROUTE(app)

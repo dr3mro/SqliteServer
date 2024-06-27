@@ -4,9 +4,9 @@
 
 using json = jsoncons::json;
 
-class RestController {
+class PatientController {
 public:
-    RestController(DatabaseController& dbController, RestHelper& rHelper);
+    PatientController(DatabaseController& dbController, RestHelper& rHelper);
 
     // CRUD
     void create_patient_basic_information(const crow::request& req, crow::response& res);
