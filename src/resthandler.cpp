@@ -116,7 +116,7 @@ void RestHandler::register_user(const crow::request& req, crow::response& res)
         auto userdata_json = json::parse(req.body);
     } catch (const std::exception& e) {
         format_response(response_json, -1, "failed to create a new user, invalid json", fmt::format("error parsing user data: {}", e.what()));
-        finish_response(res, 401, response_json);
+        finish_response(res, 1001, response_json);
         return;
         ;
     }
@@ -134,7 +134,7 @@ void RestHandler::register_user(const crow::request& req, crow::response& res)
         // Check if the password matches the pattern
         if (!std::regex_match(password, password_pattern)) {
             format_response(response_json, -1, "failed to create a new user, invalid password", "password in weak");
-            finish_response(res, 402, response_json);
+            finish_response(res, 400, response_json);
             return;
         }
 
@@ -148,20 +148,20 @@ void RestHandler::register_user(const crow::request& req, crow::response& res)
         std::regex space_pattern("\\s");
         if (std::regex_search(username, space_pattern)) {
             format_response(response_json, -1, "failed to create a new user, username contains spaces", "username contains spaces");
-            finish_response(res, 402, response_json);
+            finish_response(res, 400, response_json);
             return;
         }
 
         // check if user exists
         if (dbHandler.checkItemExists("users", "username", username)) {
             format_response(response_json, -1, "failed to create a new user, user exists", "user already exists");
-            finish_response(res, 402, response_json);
+            finish_response(res, 400, response_json);
             return;
         }
         // check if username or password or email are empty
         if (username.empty() || password.empty() || password_hash.empty()) {
             format_response(response_json, -1, "failed to create a new user, invalid data", "empty username or password");
-            finish_response(res, 403, response_json);
+            finish_response(res, 400, response_json);
             return;
         }
 
@@ -169,7 +169,7 @@ void RestHandler::register_user(const crow::request& req, crow::response& res)
         std::regex email_pattern(R"((\w+)(\.\w+)*@(\w+)(\.\w+)+)");
         if (!std::regex_match(email, email_pattern)) {
             format_response(response_json, -1, "failed to create a new user, invalid data", "invalid email format");
-            finish_response(res, 403, response_json);
+            finish_response(res, 400, response_json);
             return;
         }
 
