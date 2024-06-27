@@ -1,3 +1,5 @@
+#pragma once
+
 #include "databasecontroller.hpp"
 #include "resthelper.hpp"
 #include <crow.h>
