@@ -17,8 +17,8 @@ CPMAddPackage("gh:madler/zlib#v1.3.1")
 CPMAddPackage("gh:CrowCpp/crow#v1.2.0")
 CPMAddPackage("gh:jtv/libpqxx#7.9.1")
 CPMAddPackage("gh:jbeder/yaml-cpp#0.8.0")
-CPMAddPackage("gh:danielaparker/jsoncons#v0.176.0")
 CPMAddPackage("gh:Thalhammer/jwt-cpp#v0.7.0")
+CPMAddPackage("gh:danielaparker/jsoncons#v0.176.0")
 CPMAddPackage("gh:okdshin/PicoSHA2#v1.0.0")
 
 file (GLOB_RECURSE SRC "src/*.cpp" )
@@ -33,8 +33,8 @@ target_include_directories(${Target}
                         "${asio_SOURCE_DIR}/asio/include"
                         "${libpqxx_SOURCE_DIR}/include"
                         "${yaml-cpp_SOURCE_DIR}/src"
-                        "${jsoncons_SOURCE_DIR}/include"
                         "${jwt-cpp_SOURCE_DIR}/src"
+                        "${jsoncons_SOURCE_DIR}/include"
                         "${PicoSHA2_SOURCE_DIR}"
                         )
 
