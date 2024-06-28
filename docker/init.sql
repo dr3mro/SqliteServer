@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS patients_basic_data (
     id INTEGER PRIMARY KEY DEFAULT nextval('patient_id_seq'),
     basic_data JSONB,
     health_data JSONB,
-    apponitments_data,
+    apponitments_data JSONB,
     created_on timestamptz DEFAULT current_timestamp,
     updated_on timestamptz DEFAULT current_timestamp
 );
