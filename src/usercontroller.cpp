@@ -16,7 +16,7 @@ void UserController::register_user(const crow::request& req, crow::response& res
         auto userdata_json = json::parse(req.body);
     } catch (const std::exception& e) {
         rHelper.format_response(response_json, -1, "failed to create a new user, invalid json", fmt::format("error parsing user data: {}", e.what()));
-        rHelper.finish_response(res, 1001, response_json);
+        rHelper.finish_response(res, 400, response_json);
         return;
         ;
     }
