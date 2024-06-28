@@ -50,6 +50,19 @@ Connection: Keep-Alive
     "status message": "failed to create a new user, invalid json"
 }%
 
+if invalid username
+HTTP/1.1 400 Bad Request
+Content-Length: 182
+Server: ProjectValhalla
+Date: Fri, 28 Jun 2024 00:06:08 GMT
+Connection: Keep-Alive
+
+{
+    "response": "username should always be in lowercase characters and numbers only",
+    "status id": -1,
+    "status message": "failed to create a new user, invalid username"
+}%
+
 if weak password:
 
 HTTP/1.1 400 Bad Request

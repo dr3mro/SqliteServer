@@ -40,8 +40,9 @@ int main()
         // create routes for api v1
         API_V1_Routes routes(app, userController, patientController);
 
-        // Start the server on port 8080
+        // Start the server on port %PORT%
         std::cout << fmt::format("database server is started on port {}.\n", PORT);
+
         app.loglevel(crow::LogLevel::INFO)
             .use_compression(crow::compression::algorithm::GZIP)
             .port(PORT)
@@ -50,6 +51,7 @@ int main()
             .bindaddr("0.0.0.0")
             .server_name("ProjectValhalla")
             .run();
+
     } catch (const std::exception& e) {
         std::cerr << "Exception caught in main: " << e.what() << std::endl;
         return 1; // Exit with error code

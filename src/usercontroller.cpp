@@ -25,6 +25,15 @@ void UserController::register_user(const crow::request& req, crow::response& res
         auto userdata_json = json::parse(req.body);
 
         std::string username = userdata_json["username"].as<std::string>();
+        const std::regex username_pattern("^[a-z][a-z0-9]*$");
+
+        // Check if the string matches the pattern
+        if (!std::regex_match(username, username_pattern)) {
+            rHelper.format_response(response_json, -1, "failed to create a new user, invalid username", "username should always be in lowercase characters and numbers only");
+            rHelper.finish_response(res, 400, response_json);
+            return;
+        }
+
         userdata_json.erase("username");
         std::string password = userdata_json["password"].as<std::string>();
 
