@@ -11,74 +11,27 @@ UserController::UserController(DatabaseController& dbController, RestHelper& rHe
 void UserController::register_user(const crow::request& req, crow::response& res)
 {
     json response_json;
-    // try to parse json and throw error if invalid json
-    try {
-        auto userdata_json = json::parse(req.body);
-    } catch (const std::exception& e) {
-        error(res, response_json, "failed to create a new user, invalid json", fmt::format("error parsing user data: {}", e.what()), -1, 400);
+    // check json validity
+    if (!is_request_data_valid(req, res, response_json)) {
         return;
     }
+
     // parse the json and extract the data
     try {
+        // get the json from request body
         auto userdata_json = json::parse(req.body);
 
-        std::string username = userdata_json["username"].as<std::string>();
-        const std::regex username_pattern("^[a-z][a-z0-9]*$");
+        UserRegisterationData userRegisterationData;
 
-        // Check if the string matches the pattern
-        if (!std::regex_match(username, username_pattern)) {
-            error(res, response_json, "failed to create a new user, invalid username", "username should always be in lowercase characters and numbers only", -1, 400);
-            return;
-        }
-
-        userdata_json.erase("username");
-        std::string password = userdata_json["password"].as<std::string>();
-
-        // Define the regex pattern for a valid password
-        const std::regex password_pattern("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,}$");
-
-        // Check if the password matches the pattern
-        if (!std::regex_match(password, password_pattern)) {
-            error(res, response_json, "failed to create a new user, invalid password", "password is weak", -1, 400);
-            return;
-        }
-
-        userdata_json.erase("password");
-        std::string password_hash = picosha2::hash256_hex_string(password);
-        std::string role = userdata_json["role"].as<std::string>();
-        std::string user_data = userdata_json["user_data"].as<std::string>();
-        std::string email = userdata_json["user_data"]["contact"]["email"].as<std::string>();
-
-        // check if username contains spaces
-        std::regex space_pattern("\\s");
-        if (std::regex_search(username, space_pattern)) {
-            error(res, response_json, "failed to create a new user, username contains spaces", "username contains spaces", -1, 400);
-            return;
-        }
-
-        // check if user exists
-        if (dbController.checkItemExists("users", "username", username)) {
-            error(res, response_json, "failed to create a new user, user exists", "user already exists", -1, 400);
-            return;
-        }
-
-        // check if username or password or email are empty
-        if (username.empty() || password.empty() || password_hash.empty()) {
-            error(res, response_json, "failed to create a new user, invalid data", "empty username or password", -1, 400);
-            return;
-        }
-
-        // Check if the email matches the pattern
-        std::regex email_pattern(R"((\w+)(\.\w+)*@(\w+)(\.\w+)+)");
-        if (!std::regex_match(email, email_pattern)) {
-            error(res, response_json, "failed to create a new user, invalid data", "invalid email format", -1, 400);
+        // extract and validate user registeration data
+        if (!extract_and_sanity_check_user_registeration_data(userRegisterationData, userdata_json, response_json, res)) {
             return;
         }
 
         //  Construct SQL query using {fmt} for parameterized query
         std::string query
             = fmt::format("INSERT INTO users (username, password_hash, role, user_data) VALUES ('{}','{}','{}','{}') ",
-                username, password_hash, role, user_data);
+                userRegisterationData.username, userRegisterationData.password_hash, userRegisterationData.role, userRegisterationData.user_data);
 
         // Execute the query using DatabaseHandler
         json query_results_json = dbController.executeQuery(query);
@@ -88,12 +41,105 @@ void UserController::register_user(const crow::request& req, crow::response& res
 
     } catch (const std::exception& e) {
         // Handle exception (log, etc.)
-        error(res, response_json, "failure", fmt::format("failed: {}", e.what()), -2, 500);
+        respond_with_error(res, response_json, "failure", fmt::format("failed: {}", e.what()), -2, 500);
     }
 }
 
-void UserController::error(crow::response& res, json& response_json, const std::string& status_message, const std::string& response, const short status, const short code)
+void UserController::respond_with_error(crow::response& res, json& response_json, const std::string& status_message, const std::string& response, const short status, const short code)
 {
     rHelper.format_response(response_json, status, status_message, response);
     rHelper.finish_response(res, code, response_json);
+}
+
+bool UserController::is_request_data_valid(const crow::request& req, crow::response& res, json& response_json)
+{
+    // try to parse json and throw error if invalid json
+    try {
+        auto userdata_json = json::parse(req.body);
+        return true;
+    } catch (const std::exception& e) {
+        respond_with_error(res, response_json, "failed to create a new user, invalid json", fmt::format("error parsing user data: {}", e.what()), -1, 400);
+        return false;
+    }
+}
+
+inline bool UserController::is_username_pattern_valid(const std::string& username)
+{
+    const std::regex pattern("^[a-z][a-z0-9_]*$");
+    return std::regex_match(username, pattern);
+}
+inline bool UserController::is_string_contains_spaces(const std::string& string)
+{
+    std::regex pattern("\\s");
+    return std::regex_search(string, pattern);
+}
+
+inline bool UserController::is_password_pattern_valid(const std::string& password)
+{
+    const std::regex pattern("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,}$");
+    return std::regex_match(password, pattern);
+}
+
+inline bool UserController::is_email_pattern_valid(const std::string& email)
+{
+    const std::regex pattern(R"((\w+)(\.\w+)*@(\w+)(\.\w+)+)");
+    return std::regex_match(email, pattern);
+}
+
+inline bool UserController::extract_and_sanity_check_user_registeration_data(UserRegisterationData& userRegisterationData, json& userdata_json, json& response_json, crow::response& res)
+{
+    // extract the username from the json
+    userRegisterationData.username = userdata_json["username"].as<std::string>();
+
+    // check username pattern
+    if (is_username_pattern_valid(userRegisterationData.username)) {
+        userdata_json.erase("username");
+    } else {
+        respond_with_error(res, response_json, "failed to create a new user, invalid username", "username should always be in lowercase characters and underscore or numbers only", -1, 400);
+        return false;
+    }
+
+    // check password pattern
+    std::string password = userdata_json["password"].as<std::string>();
+
+    if (is_password_pattern_valid(password)) {
+        userdata_json.erase("password");
+    } else {
+        respond_with_error(res, response_json, "failed to create a new user, invalid password", "password is weak", -1, 400);
+        return false;
+    }
+
+    // create the password hash
+    userRegisterationData.password_hash = picosha2::hash256_hex_string(password);
+
+    // extract the role, userdata and email for further validation.
+    userRegisterationData.role = userdata_json["role"].as<std::string>();
+    userRegisterationData.user_data = userdata_json["user_data"].as<std::string>();
+
+    std::string email = userdata_json["user_data"]["contact"]["email"].as<std::string>();
+
+    // check if username contains spaces.
+    if (is_string_contains_spaces(userRegisterationData.username)) {
+        respond_with_error(res, response_json, "failed to create a new user, username contains spaces", "username contains spaces", -1, 400);
+        return false;
+    }
+
+    // check if user exists
+    if (dbController.checkItemExists("users", "username", userRegisterationData.username)) {
+        respond_with_error(res, response_json, "failed to create a new user, user exists", "user already exists", -1, 400);
+        return false;
+    }
+
+    // check if username or password or email are empty
+    if (userRegisterationData.username.empty() || password.empty() || userRegisterationData.password_hash.empty()) {
+        respond_with_error(res, response_json, "failed to create a new user, invalid data", "empty username or password", -1, 400);
+        return false;
+    }
+
+    // Check if the email matches the pattern
+    if (!is_email_pattern_valid(email)) {
+        respond_with_error(res, response_json, "failed to create a new user, invalid data", "invalid email format", -1, 400);
+        return false;
+    }
+    return true;
 }
