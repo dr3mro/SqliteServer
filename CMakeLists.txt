@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 set(Target "server")
 project(${Target})
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
@@ -26,7 +26,7 @@ file (GLOB_RECURSE SRC "src/*.cpp" )
 add_executable(${Target} ${SRC})
 
 target_include_directories(${Target}
-                        PRIVATE
+                        PUBLIC
                         "${jwt-cpp_SOURCE_DIR}/src"
                         "${fmt_SOURCE_DIR}/include"
                         "${zlib_SOURCE_DIR}/"
