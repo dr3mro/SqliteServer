@@ -1,5 +1,3 @@
-#pragma once
-
 #include "api_v1_routes.hpp"
 #include "databaseconnectionpool.hpp"
 #include "databasecontroller.hpp"
