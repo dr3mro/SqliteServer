@@ -11,7 +11,7 @@ git pull
 
 # Build the project
 cmake -S . -GNinja
-cmake --build . -j 2
+cmake --build . -j 2 --trace
 
 # Execute the server
 exec ./server
