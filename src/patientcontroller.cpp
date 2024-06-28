@@ -2,9 +2,10 @@
 #include <crow.h>
 #include <fmt/core.h> // Include fmt library for string formatting
 
-PatientController::PatientController(DatabaseController& dbController, RestHelper& rHelper)
+PatientController::PatientController(DatabaseController& dbController, RestHelper& rHelper, Tokenizer& tokenizer)
     : dbController(dbController)
     , rHelper(rHelper)
+    , tokenizer(tokenizer)
 {
 }
 

@@ -3,6 +3,7 @@
 #include "databasecontroller.hpp"
 #include "patientcontroller.hpp"
 #include "resthelper.hpp"
+#include "tokenizer.hpp"
 #include "usercontroller.hpp"
 #include <crow.h>
 #include <fmt/core.h>
@@ -26,11 +27,14 @@ int main()
         // Create REST helper
         RestHelper restHelper(dbController);
 
+        // Create tokenizer
+        Tokenizer tokenizer;
+
         // Create Patient Controller
-        PatientController patientController(dbController, restHelper);
+        PatientController patientController(dbController, restHelper, tokenizer);
 
         // Create User Controller
-        UserController userController(dbController, restHelper);
+        UserController userController(dbController, restHelper, tokenizer);
 
         // Initialize Crow application
         crow::SimpleApp app;

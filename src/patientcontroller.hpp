@@ -1,13 +1,14 @@
 #pragma once
 #include "databasecontroller.hpp"
 #include "resthelper.hpp"
+#include "tokenizer.hpp"
 #include <crow.h>
 
 using json = jsoncons::json;
 
 class PatientController {
 public:
-    PatientController(DatabaseController& dbController, RestHelper& rHelper);
+    PatientController(DatabaseController& dbController, RestHelper& rHelper, Tokenizer& tokenizer);
 
     // CRUD
     void create_patient_basic_information(const crow::request& req, crow::response& res);
@@ -18,4 +19,5 @@ public:
 private:
     DatabaseController& dbController;
     RestHelper& rHelper;
+    Tokenizer& tokenizer;
 };

@@ -20,8 +20,7 @@ CREATE TABLE IF NOT EXISTS patients_basic_data (
 CREATE TABLE users (
     user_id INTEGER PRIMARY KEY DEFAULT nextval('user_id_seq'),
     username VARCHAR(100) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    token VARCHAR(255),
+    password_hash VARCHAR(255) NOT NULL
     role VARCHAR(50) NOT NULL,
     user_data JSONB
 );

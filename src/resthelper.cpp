@@ -1,4 +1,5 @@
 #include "resthelper.hpp"
+#include <jwt-cpp/jwt.h>
 
 RestHelper::RestHelper(DatabaseController& dbController)
     : dbController(dbController)

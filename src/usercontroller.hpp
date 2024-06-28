@@ -2,6 +2,7 @@
 
 #include "databasecontroller.hpp"
 #include "resthelper.hpp"
+#include "tokenizer.hpp"
 #include <crow.h>
 #include <memory>
 
@@ -9,7 +10,7 @@ using json = jsoncons::json;
 
 class UserController {
 public:
-    UserController(DatabaseController& dbController, RestHelper& rHelper);
+    UserController(DatabaseController& dbController, RestHelper& rHelper, Tokenizer& tokenizer);
     UserController();
     ~UserController();
 
