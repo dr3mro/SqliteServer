@@ -14,4 +14,6 @@ public:
 private:
     DatabaseController& dbController;
     RestHelper& rHelper;
+
+    void error(crow::response& res, json& response_json, const std::string& status_message, const std::string& response, const short status, const short code);
 };
