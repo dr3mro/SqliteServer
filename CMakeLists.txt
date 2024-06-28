@@ -28,7 +28,7 @@ add_executable(${Target} ${SRC})
 target_include_directories(${Target}
                         PRIVATE
                         "${fmt_SOURCE_DIR}/include"
-                        "${zlib_SOURCE_DIR}/",
+                        "${zlib_SOURCE_DIR}/"
                         "${crow_SOURCE_DIR}/include"
                         "${asio_SOURCE_DIR}/asio/include"
                         "${libpqxx_SOURCE_DIR}/include"
