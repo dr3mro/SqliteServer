@@ -20,7 +20,6 @@ private:
         std::string password_hash;
         std::string role;
         std::string user_data;
-        std::string email;
 
     } UserRegisterationData;
 
