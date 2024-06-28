@@ -142,11 +142,13 @@ uint64_t UserController::Impl::authenticate_user(const std::string& username, co
     try {
         uint64_t user_id = dbController.findIfUserID(username);
 
-        if (!static_cast<bool>(user_id))
+        if (user_id == 0)
             return 0;
 
         if (dbController.getPasswordHashForUserID(user_id) == picosha2::hash256_hex_string(password))
             return user_id;
+        else
+            return 0;
 
     } catch (const std::exception& e) {
         std::cerr << "Error authenticating user : " << e.what() << std::endl;
@@ -256,7 +258,7 @@ void UserController::login_user(const crow::request& req, crow::response& res)
         uint64_t user_id = pImpl->authenticate_user(username, password);
 
         if (user_id == 0) {
-            pImpl->respond_with_error(res, response_json, "Login Failure", fmt::format("User '{}' not found", username), -1, 400);
+            pImpl->respond_with_error(res, response_json, "Login Failure", fmt::format("User '{}' not found or wrong password", username), -1, 400);
             return;
         }
 
