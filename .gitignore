@@ -2,3 +2,5 @@
 .cpm_cache
 .build
 build
+.DS_Store
+
