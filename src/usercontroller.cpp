@@ -1,5 +1,6 @@
 #include "usercontroller.hpp"
 #include <fmt/core.h> // Include fmt library for string formatting
+#include <jsoncons/json.hpp> // Include jsoncons library for JSON handling
 #include <picosha2.h>
 #include <regex>
 

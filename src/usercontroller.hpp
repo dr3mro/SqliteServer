@@ -3,7 +3,6 @@
 #include "databasecontroller.hpp"
 #include "resthelper.hpp"
 #include <crow.h>
-#include <jsoncons/json.hpp> // Include jsoncons library for JSON handling
 #include <memory>
 
 using json = jsoncons::json;
