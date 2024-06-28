@@ -8,6 +8,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
+
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" )
 include(CPM)
 
@@ -20,6 +21,9 @@ CPMAddPackage("gh:jbeder/yaml-cpp#0.8.0")
 CPMAddPackage("gh:danielaparker/jsoncons#v0.176.0")
 CPMAddPackage("gh:Thalhammer/jwt-cpp#v0.7.0")
 CPMAddPackage("gh:okdshin/PicoSHA2#v1.0.0")
+
+set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE INTERNAL "No dev warnings")
+set(CMAKE_WARN_DEPRECATED OFF)
 
 file (GLOB_RECURSE SRC "src/*.cpp" )
 

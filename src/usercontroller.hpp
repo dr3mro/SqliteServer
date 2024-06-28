@@ -12,6 +12,8 @@ public:
     UserController(DatabaseController& dbController, RestHelper& rHelper);
     UserController();
     ~UserController();
+
+    //
     void register_user(const crow::request& req, crow::response& res);
 
 private:
