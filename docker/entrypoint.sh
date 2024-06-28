@@ -10,8 +10,8 @@ fi
 git pull
 
 # Build the project
-cmake -GNinja .
-ninja
+cmake -S . -GNinja
+cmake --build . -j 2
 
 # Execute the server
 exec ./server
