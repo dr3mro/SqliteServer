@@ -1,6 +1,7 @@
 #include "usercontroller.hpp"
 #include <fmt/core.h> // Include fmt library for string formatting
 #include <jsoncons/json.hpp> // Include jsoncons library for JSON handling
+#include <jwt-cpp/jwt.h>
 #include <picosha2.h>
 #include <regex>
 
@@ -27,6 +28,10 @@ public:
     bool is_password_pattern_valid(const std::string& password);
     bool is_email_pattern_valid(const std::string& email);
     bool extract_and_sanity_check_user_registration_data(UserRegistrationData& userRegistrationData, json& userdata_json, json& response_json, crow::response& res);
+
+    std::string generate_token(const std::string& username);
+    uint64_t authenticate_user(const std::string& username, const std::string& password);
+    bool add_token_to_login_response(json& query_results_json, const std::string& token);
 
     DatabaseController& dbController;
     RestHelper& rHelper;
@@ -132,6 +137,56 @@ bool UserController::Impl::extract_and_sanity_check_user_registration_data(UserR
     return true;
 }
 
+uint64_t UserController::Impl::authenticate_user(const std::string& username, const std::string& password)
+{
+    try {
+        uint64_t user_id = dbController.findIfUserID(username);
+
+        if (!static_cast<bool>(user_id))
+            return 0;
+
+        if (dbController.getPasswordHashForUserID(user_id) == picosha2::hash256_hex_string(password))
+            return user_id;
+
+    } catch (const std::exception& e) {
+        std::cerr << "Error authenticating user : " << e.what() << std::endl;
+    }
+    return 0;
+}
+
+// Function to generate JWT token
+std::string UserController::Impl::generate_token(const std::string& username)
+{
+    try {
+        // Create JWT token with payload
+        auto token = jwt::create()
+                         .set_issuer("ProjectValhalla")
+                         .set_type("JWS")
+                         .set_subject(username)
+                         .set_issued_at(std::chrono::system_clock::now())
+                         .set_expires_at(std::chrono::system_clock::now() + std::chrono::minutes { 15 })
+                         .sign(jwt::algorithm::hs256 { "01234567890123456789012345678901" });
+
+        return token;
+    } catch (const std::exception& e) {
+        std::cerr << "Error generating token: " << e.what() << std::endl;
+        return "";
+    }
+}
+
+bool UserController::Impl::add_token_to_login_response(json& query_results_json, const std::string& token)
+{
+    try {
+        json token_object;
+        token_object["token"] = token;
+        query_results_json.emplace_back(token_object);
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error generating token: " << e.what() << std::endl;
+        return false;
+    }
+}
+
 UserController::UserController(DatabaseController& dbController, RestHelper& rHelper)
     : pImpl(std::make_unique<Impl>(dbController, rHelper))
 {
@@ -172,6 +227,56 @@ void UserController::register_user(const crow::request& req, crow::response& res
 
         // Execute the query using DatabaseController
         json query_results_json = pImpl->dbController.executeQuery(query);
+
+        pImpl->rHelper.evaluate_response(response_json, query_results_json);
+        pImpl->rHelper.finish_response(res, 200, response_json);
+
+    } catch (const std::exception& e) {
+        // Handle exception (log, etc.)
+        pImpl->respond_with_error(res, response_json, "Failure", fmt::format("Failed: {}", e.what()), -2, 500);
+    }
+}
+
+void UserController::login_user(const crow::request& req, crow::response& res)
+{
+    json response_json;
+    // Check JSON validity
+    if (!pImpl->is_request_data_valid(req, res, response_json)) {
+        return;
+    }
+
+    // Parse the JSON and extract the data
+    try {
+        // Get the JSON from request body
+        auto userdata_json = json::parse(req.body);
+
+        std::string username = userdata_json["username"].as<std::string>();
+        std::string password = userdata_json["password"].as<std::string>();
+
+        uint64_t user_id = pImpl->authenticate_user(username, password);
+
+        if (user_id == 0) {
+            pImpl->respond_with_error(res, response_json, "Login Failure", fmt::format("User '{}' not found", username), -1, 400);
+            return;
+        }
+
+        std::string token = pImpl->generate_token(username);
+
+        if (token.length() == 0) {
+            pImpl->respond_with_error(res, response_json, "Login Failure", fmt::format("Failed to create token for user '{}'", username), -1, 400);
+        }
+
+        // Construct SQL query using {fmt} for parameterized query
+        std::string query = fmt::format(
+            "UPDATE users SET token = '{}' WHERE user_id = '{}';", token, user_id);
+
+        // Execute the query using DatabaseController
+        json query_results_json = pImpl->dbController.executeQuery(query);
+
+        if (!pImpl->add_token_to_login_response(query_results_json, token)) {
+            pImpl->respond_with_error(res, response_json, "Login Failure", fmt::format("Failed to reply with token", username), -1, 400);
+            return;
+        }
 
         pImpl->rHelper.evaluate_response(response_json, query_results_json);
         pImpl->rHelper.finish_response(res, 200, response_json);

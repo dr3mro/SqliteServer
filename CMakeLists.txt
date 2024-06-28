@@ -27,6 +27,8 @@ set(CMAKE_WARN_DEPRECATED OFF)
 
 file (GLOB_RECURSE SRC "src/*.cpp" )
 
+find_package(OpenSSL REQUIRED)
+
 add_executable(${Target} ${SRC})
 
 target_include_directories(${Target}
@@ -38,13 +40,27 @@ target_include_directories(${Target}
                         "${libpqxx_SOURCE_DIR}/include"
                         "${yaml-cpp_SOURCE_DIR}/src"
                         "${jsoncons_SOURCE_DIR}/include"
-                        "${jwt-cpp_SOURCE_DIR}/src"
+                        "${jwt-cpp_SOURCE_DIR}/include"
                         "${PicoSHA2_SOURCE_DIR}"
+                        "${OPENSSL_INCLUDE_DIR}"
                         )
+
+#Function to print all variables
+
+# function(print_all_variables)
+#     get_cmake_property(_variableNames VARIABLES)
+#     list(SORT _variableNames)
+#     foreach(_variableName ${_variableNames})
+#         message(STATUS "${_variableName}=${${_variableName}}")
+#     endforeach()
+# endfunction()
+
+# # Call the function to print all variables
+# print_all_variables()
 
 target_compile_definitions(${Target}  PUBLIC CROW_ENABLE_COMPRESSION)
 
-target_link_libraries(${Target}  PRIVATE  fmt zlib pqxx yaml-cpp ${PostgreSQL_LIBRARIES})
+target_link_libraries(${Target}  PRIVATE  fmt zlib pqxx yaml-cpp jwt-cpp ${PostgreSQL_LIBRARIES})
 
 
 

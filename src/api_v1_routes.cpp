@@ -11,10 +11,9 @@ API_V1_Routes::API_V1_Routes(crow::SimpleApp& app, UserController& userControlle
             userController.register_user(std::ref(req), std::ref(res));
         });
 
-    CROW_ROUTE(app, "/v1/authenticate")
-        .methods("POST"_method)([&patientController](const crow::request& req, crow::response& res) {
-            // here we implement code to check login credenials and create token to be used during the next requests
-            // it well get user and password in header and return a token that will be stored in the database for later use
+    CROW_ROUTE(app, "/v1/login")
+        .methods("POST"_method)([&userController](const crow::request& req, crow::response& res) {
+            userController.login_user(std::ref(req), std::ref(res));
         });
 
     CROW_ROUTE(app, "/v1/retrieve")
