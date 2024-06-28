@@ -14,7 +14,7 @@ public:
     UserController();
     ~UserController();
 
-    //
+    // PUBLIC
     void register_user(const crow::request& req, crow::response& res);
     void login_user(const crow::request& req, crow::response& res);
 

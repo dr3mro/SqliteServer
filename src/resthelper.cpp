@@ -1,4 +1,5 @@
 #include "resthelper.hpp"
+#include "fmt/core.h"
 #include <jwt-cpp/jwt.h>
 
 RestHelper::RestHelper(DatabaseController& dbController)
@@ -50,4 +51,22 @@ void RestHelper::finish_response(crow::response& res, const int& code, const jso
     res.code = code;
     res.write(body);
     res.end();
+}
+
+bool RestHelper::is_request_data_valid(const crow::request& req, crow::response& res, json& response_json)
+{
+    // Try to parse json and throw error if invalid json
+    try {
+        auto userdata_json = json::parse(req.body);
+        return true;
+    } catch (const std::exception& e) {
+        respond_with_error(res, response_json, "Failed to create a new user, invalid JSON", fmt::format("Error parsing user data: {}", e.what()), -1, 400);
+        return false;
+    }
+}
+
+void RestHelper::respond_with_error(crow::response& res, json& response_json, const std::string& status_message, const std::string& response, const short status, const short code)
+{
+    format_response(response_json, status, status_message, response);
+    finish_response(res, code, response_json);
 }

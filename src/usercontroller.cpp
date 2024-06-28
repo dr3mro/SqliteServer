@@ -21,8 +21,6 @@ public:
         std::string user_data;
     } UserRegistrationData;
 
-    void respond_with_error(crow::response& res, json& response_json, const std::string& status_message, const std::string& response, const short status, const short code);
-    bool is_request_data_valid(const crow::request& req, crow::response& res, json& response_json);
     bool is_username_pattern_valid(const std::string& username);
     bool is_string_contains_spaces(const std::string& string);
     bool is_password_pattern_valid(const std::string& password);
@@ -35,24 +33,6 @@ public:
     RestHelper& rHelper;
     Tokenizer& tokenizer;
 };
-
-void UserController::Impl::respond_with_error(crow::response& res, json& response_json, const std::string& status_message, const std::string& response, const short status, const short code)
-{
-    rHelper.format_response(response_json, status, status_message, response);
-    rHelper.finish_response(res, code, response_json);
-}
-
-bool UserController::Impl::is_request_data_valid(const crow::request& req, crow::response& res, json& response_json)
-{
-    // Try to parse json and throw error if invalid json
-    try {
-        auto userdata_json = json::parse(req.body);
-        return true;
-    } catch (const std::exception& e) {
-        respond_with_error(res, response_json, "Failed to create a new user, invalid JSON", fmt::format("Error parsing user data: {}", e.what()), -1, 400);
-        return false;
-    }
-}
 
 bool UserController::Impl::is_username_pattern_valid(const std::string& username)
 {
@@ -87,7 +67,7 @@ bool UserController::Impl::extract_and_sanity_check_user_registration_data(UserR
     if (is_username_pattern_valid(userRegistrationData.username)) {
         userdata_json.erase("username");
     } else {
-        respond_with_error(res, response_json, "Failed to create a new user, invalid username", "Username should always be in lowercase characters and underscore or numbers only", -1, 400);
+        rHelper.respond_with_error(res, response_json, "Failed to create a new user, invalid username", "Username should always be in lowercase characters and underscore or numbers only", -1, 400);
         return false;
     }
 
@@ -97,7 +77,7 @@ bool UserController::Impl::extract_and_sanity_check_user_registration_data(UserR
     if (is_password_pattern_valid(password)) {
         userdata_json.erase("password");
     } else {
-        respond_with_error(res, response_json, "Failed to create a new user, invalid password", "Password is weak", -1, 400);
+        rHelper.respond_with_error(res, response_json, "Failed to create a new user, invalid password", "Password is weak", -1, 400);
         return false;
     }
 
@@ -112,25 +92,25 @@ bool UserController::Impl::extract_and_sanity_check_user_registration_data(UserR
 
     // Check if username contains spaces
     if (is_string_contains_spaces(userRegistrationData.username)) {
-        respond_with_error(res, response_json, "Failed to create a new user, username contains spaces", "Username contains spaces", -1, 400);
+        rHelper.respond_with_error(res, response_json, "Failed to create a new user, username contains spaces", "Username contains spaces", -1, 400);
         return false;
     }
 
     // Check if user exists
     if (dbController.checkItemExists("users", "username", userRegistrationData.username)) {
-        respond_with_error(res, response_json, "Failed to create a new user, user exists", "User already exists", -1, 400);
+        rHelper.respond_with_error(res, response_json, "Failed to create a new user, user exists", "User already exists", -1, 400);
         return false;
     }
 
     // Check if username, password, or email are empty
     if (userRegistrationData.username.empty() || password.empty() || userRegistrationData.password_hash.empty()) {
-        respond_with_error(res, response_json, "Failed to create a new user, invalid data", "Empty username or password", -1, 400);
+        rHelper.respond_with_error(res, response_json, "Failed to create a new user, invalid data", "Empty username or password", -1, 400);
         return false;
     }
 
     // Check if the email matches the pattern
     if (!is_email_pattern_valid(email)) {
-        respond_with_error(res, response_json, "Failed to create a new user, invalid data", "Invalid email format", -1, 400);
+        rHelper.respond_with_error(res, response_json, "Failed to create a new user, invalid data", "Invalid email format", -1, 400);
         return false;
     }
     return true;
@@ -168,11 +148,13 @@ UserController::~UserController()
 {
 }
 
+//////////////// PUBLIC /////////////////////////////
+
 void UserController::register_user(const crow::request& req, crow::response& res)
 {
     json response_json;
     // Check JSON validity
-    if (!pImpl->is_request_data_valid(req, res, response_json)) {
+    if (!pImpl->rHelper.is_request_data_valid(req, res, response_json)) {
         return;
     }
 
@@ -201,7 +183,7 @@ void UserController::register_user(const crow::request& req, crow::response& res
 
     } catch (const std::exception& e) {
         // Handle exception (log, etc.)
-        pImpl->respond_with_error(res, response_json, "Failure", fmt::format("Failed: {}", e.what()), -2, 500);
+        pImpl->rHelper.respond_with_error(res, response_json, "Failure", fmt::format("Failed: {}", e.what()), -2, 500);
     }
 }
 
@@ -209,7 +191,7 @@ void UserController::login_user(const crow::request& req, crow::response& res)
 {
     json response_json;
     // Check JSON validity
-    if (!pImpl->is_request_data_valid(req, res, response_json)) {
+    if (!pImpl->rHelper.is_request_data_valid(req, res, response_json)) {
         return;
     }
 
@@ -224,14 +206,14 @@ void UserController::login_user(const crow::request& req, crow::response& res)
         uint64_t user_id = pImpl->authenticate_user(username, password);
 
         if (user_id == 0) {
-            pImpl->respond_with_error(res, response_json, "Login Failure", fmt::format("User '{}' not found or wrong password", username), -1, 400);
+            pImpl->rHelper.respond_with_error(res, response_json, "Login Failure", fmt::format("User '{}' not found or wrong password", username), -1, 400);
             return;
         }
 
         std::string token = pImpl->tokenizer.generate_token(username);
 
         if (!pImpl->tokenizer.token_validator(token, username)) {
-            pImpl->respond_with_error(res, response_json, "Login Failure", fmt::format("Failed to create token for user '{}'", username), -1, 400);
+            pImpl->rHelper.respond_with_error(res, response_json, "Login Failure", fmt::format("Failed to create token for user '{}'", username), -1, 400);
         }
 
         json token_object;
@@ -242,6 +224,6 @@ void UserController::login_user(const crow::request& req, crow::response& res)
 
     } catch (const std::exception& e) {
         // Handle exception (log, etc.)
-        pImpl->respond_with_error(res, response_json, "Failure", fmt::format("Failed: {}", e.what()), -2, 500);
+        pImpl->rHelper.respond_with_error(res, response_json, "Failure", fmt::format("Failed: {}", e.what()), -2, 500);
     }
 }
