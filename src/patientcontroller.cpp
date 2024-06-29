@@ -1,6 +1,8 @@
 #include "patientcontroller.hpp"
 #include <crow.h>
 #include <fmt/core.h> // Include fmt library for string formatting
+#include <fmt/ranges.h>
+#include <vector>
 
 PatientController::PatientController(DatabaseController& dbController, RestHelper& rHelper, Tokenizer& tokenizer)
     : dbController(dbController)
@@ -84,8 +86,34 @@ void PatientController::get_patient_data(const crow::request& req, crow::respons
 {
     json response_json;
     try {
+        typedef struct {
+            uint64_t user_id;
+            std::vector<std::string> schema;
+            std::string username;
+            std::string token;
+
+            void fill(const json& data)
+            {
+                user_id = data["id"].as<uint64_t>();
+                schema = data["schema"].as<std::vector<std::string>>();
+                username = data["username"].as<std::string>();
+                token = data["token"].as<std::string>();
+            }
+        } PatientData;
+
+        PatientData patientData;
+        json data_json = json::parse(req.body);
+        patientData.fill(data_json);
+
+        if (!tokenizer.token_validator(patientData.token, patientData.username)) {
+            rHelper.respond_with_error(res, response_json, "failed to retrieve patient", "token is invalidated", -1, 400);
+            return;
+        }
+
+        std::string columns = fmt::format("{}", fmt::join(patientData.schema, ", "));
+
         std::string query
-            = fmt::format("SELECT FROM patients WHERE id=?");
+            = fmt::format("SELECT {} FROM patients WHERE id={}", columns, patientData.user_id);
         json query_results_json = dbController.executeReadQuery(query);
 
         if (query_results_json.empty()) {

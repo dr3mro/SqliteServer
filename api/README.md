@@ -1,119 +1,68 @@
-#
-
-
-
-# register a user
-
-send POST request to
-            /api_v1/register
-
-with user1.json
-
-            $ curl -X POST -H "Content-Type: application/json" -d @user1.json http://localhost:8080/v1/register -i
-
-if success :
-
+# PROJECT VALHALLA
+### user registeration
+```
+$ curl -X POST -H "Content-Type: application/json" -d @user.json http://localhost:8080/v1/register -i
+```
+- do a POST request on /v1/register with a body contains a JSON with following data
+```
 {
-    "response": [
-        {
-            "affected rows": 1
-        }
-    ],
-    "status id": 0,
-    "status message": "success"
+  "payload": {
+    "fullname": "Amr Nasr",
+    "username": "amr_nasr",
+    "password": "123Mm@p0",
+    "role": 0,
+    "user_data": {
+      "contact": {
+        "phone": "+201299999999",
+        "email": "amr@mail.com"
+      },
+      "address": {
+        "city": "Damietta",
+        "street": "portsaid street"
+      },
+      "dob": "1990-10-10",
+      "gender": "male",
+      "married": true,
+      "job": {
+        "position": "Doctor",
+        "speciality": "Cardiology"
+      }
+    }
+  },
+  "sha256sum": "8657efb831ff66d61a6f26106a7acbe3f5a3bbc021b97fe1f1e4f69f21e20ec6",
+  "username": "admin",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MTk2NjI2MjksImlhdCI6MTcxOTY2MTcyOSwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.sDa6GIw-cve507uEth6tBfQ5OGfuAfxIl7P3JuSfS8c"
 }
+```
+- the "payload" value is verified on the server against SHA256SUM that should be generated and added to the JSON in sha256sum key.
+- in the next updates there would be a token for creating users and should be supplied with every registeration but for now its not being used, currently "payload" "sha256sum" are the only needed.
+- in the "payload" the username should only composed of lower case characters and numbers and not start with number and does not contains white spaces.
+- the password should contains upper and lower case characters, symbols, numbers and at lest 8 characters long.
+- the email should be in a valid format user@domain.ext
+- the role value is for now '0' as the role implementation is WIP.
 
-if user exists:
-
-HTTP/1.1 400 Bad Request
-Content-Length: 132
-Server: ProjectValhalla
-Date: Thu, 27 Jun 2024 17:08:34 GMT
-Connection: Keep-Alive
-
+### user login
+```
+ curl -X POST -H "Content-Type: application/json" -d @login.json http://localhost:8080/v1/login -i
+```
+- do a POST request on /v1/login with a body contains a JSON with following data
+```
 {
-    "response": "user already exists",
-    "status id": -1,
-    "status message": "failed to create a new user, user exists"
-}%
+    "username" : "amr_nasr",
+    "password" : "123Mm@p0"
+}
+```
+- the username should be in lowecase and/or numbers and never contains spaces or symbols.
+- the password should be uppercase and lowercase and characters and symbols.
 
-if invalid json :
 
-HTTP/1.1 400 Bad Request
-Content-Length: 132
-Server: ProjectValhalla
-Date: Thu, 27 Jun 2024 17:08:34 GMT
-Connection: Keep-Alive
-{
-    "response": "error parsing user data: Unexpected end of file at line 1 and column 490",
-    "status id": -1,
-    "status message": "failed to create a new user, invalid json"
-}%
+### patient add
 
-if invalid username
-HTTP/1.1 400 Bad Request
-Content-Length: 182
-Server: ProjectValhalla
-Date: Fri, 28 Jun 2024 00:06:08 GMT
-Connection: Keep-Alive
+### patient get
 
-{
-    "response": "username should always be in lowercase characters and numbers only",
-    "status id": -1,
-    "status message": "failed to create a new user, invalid username"
-}%
-
-if weak password:
-
-HTTP/1.1 400 Bad Request
-Content-Length: 132
-Server: ProjectValhalla
-Date: Thu, 27 Jun 2024 17:08:34 GMT
-Connection: Keep-Alive
-{
-    "response": "password in weak",
-    "status id": -1,
-    "status message": "failed to create a new user, invalid password"
-}%
-
-if invalid username:
-
-HTTP/1.1 400 Bad Request
-Content-Length: 132
-Server: ProjectValhalla
-Date: Thu, 27 Jun 2024 17:08:34 GMT
-Connection: Keep-Alive
-{
-    "response": "username contains spaces",
-    "status id": -1,
-    "status message": "failed to create a new user, username contains spaces"
-}%
-
-if empty username or password:
-
-HTTP/1.1 400 Bad Request
-Content-Length: 132
-Server: ProjectValhalla
-Date: Thu, 27 Jun 2024 17:08:34 GMT
-Connection: Keep-Alive
-{
-    "response": "empty username or password",
-    "status id": -1,
-    "status message": "failed to create a new user, invalid data"
-}%
-
-if invalid email:
-
-HTTP/1.1 400 Bad Request
-Content-Length: 132
-Server: ProjectValhalla
-Date: Thu, 27 Jun 2024 17:08:34 GMT
-Connection: Keep-Alive
-{
-    "response": "invalid email format",
-    "status id": -1,
-    "status message": "failed to create a new user, invalid data"
-}%
-
-====
-
+### patient update
+ - WIP
+### patient delete
+ - WIP
+### patient search
+ - WIP
