@@ -95,6 +95,37 @@ Connection: Keep-Alive
 ```
 - the username should be in lowecase and/or numbers and never contains spaces or symbols.
 - the password should be uppercase and lowercase and characters and symbols.
+- A successful login looks like this
+```
+HTTP/1.1 200 OK
+Content-Length: 285
+Server: ProjectValhalla
+Date: Sat, 29 Jun 2024 21:44:00 GMT
+Connection: Keep-Alive
+
+{
+    "response": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MTk2OTgzNDAsImlhdCI6MTcxOTY5NzQ0MCwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.2TOQNIIk-0gDxCSpNpHxVZOeN1u503viTHt8ezbcYDI"
+    },
+    "status id": 0,
+    "status message": "success"
+}%
+```
+- The returned token is valid only for 60 minutes and should be attached to every successding request and after it is expired any request will fail until the user relogin and get a new token.
+- a failed login looks like this
+``
+HTTP/1.1 400 Bad Request
+Content-Length: 128
+Server: ProjectValhalla
+Date: Sat, 29 Jun 2024 21:46:18 GMT
+Connection: Keep-Alive
+
+{
+    "response": "User 'amr_nasrm' not found or wrong password",
+    "status id": -1,
+    "status message": "Login Failure"
+}%
+``
 
 
 ### patient add
@@ -138,17 +169,17 @@ curl -X POST -H "Content-Type: application/json" -d @patient.json http://localho
   * "appointments_data"
   * "health_data"
 - The basic_data should contains {"id" = 0}.
-- Providing empty value '{}' will clear the corresponding field i the database.
-- No providing a key for example "health_data" has no effect as only the provided data is processed.
+- Providing empty value '{}' will clear the corresponding field in the database.
+- Not providing a key for example "health_data" has no effect as only the provided data is processed.
 - The payload should be verified with sha256sum and the hash should be provided in the JSON as "sha256sum" value.
 - The username should exists and be valid.
-- The access token should be valid
+- The access token should be valid.
 - A successful request will return the user_id and it looks like this.
 ```
 HTTP/1.1 200 OK
-Content-Length: 180
+Content-Length: 869
 Server: ProjectValhalla
-Date: Sat, 29 Jun 2024 13:50:27 GMT
+Date: Sat, 29 Jun 2024 21:49:37 GMT
 Connection: Keep-Alive
 
 {
@@ -157,12 +188,33 @@ Connection: Keep-Alive
             "affected rows": 1
         },
         {
-            "id": 100018
+            "appointments_data": {},
+            "basic_data": {
+                "address": "123 Main St, Anytown, USA",
+                "contact": [
+                    {
+                        "email": "john.doe@example.com"
+                    },
+                    {
+                        "phone": "+1987654321"
+                    }
+                ],
+                "date_of_birth": "1990-01-01",
+                "firstname": "John",
+                "gender": "Male",
+                "id": 100034,
+                "lastname": "Doe",
+                "occupation": "Engineer",
+                "place_of_birth": "New York"
+            },
+            "health_data": {},
+            "id": 100034
         }
     ],
     "status id": 0,
     "status message": "success"
 }%
+
 ```
 - A failed request for example if the token becomes expired would look like this.
 ```
