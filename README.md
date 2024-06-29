@@ -11,7 +11,7 @@ $ docker-compose up --build
 ```
 $ curl -X POST -H "Content-Type: application/json" -d @user.json http://localhost:8080/v1/register -i
 ```
-- do a POST request on /v1/register with a body contains a JSON with following data
+- do a POST request on `/v1/register` with a body contains a JSON with following data
 ```
 {
   "payload": {
@@ -86,7 +86,7 @@ Connection: Keep-Alive
 ```
  curl -X POST -H "Content-Type: application/json" -d @login.json http://localhost:8080/v1/login -i
 ```
-- do a POST request on /v1/login with a body contains a JSON with following data
+- do a POST request on `/v1/login` with a body contains a JSON with following data
 ```
 {
     "username" : "amr_nasr",
@@ -101,7 +101,7 @@ Connection: Keep-Alive
 ```
 curl -X POST -H "Content-Type: application/json" -d @patient.json http://localhost:8080/v1/store -i
 ```
-- In order to add a new user do a POST request in /v1/store with a body contains JSON like this.
+- In order to add a new user do a POST request in `/v1/store` with a body contains JSON like this.
 ```
 {
   "payload": {
@@ -183,7 +183,7 @@ Connection: Keep-Alive
 ```
 curl -X GET -H "Content-Type: application/json" -d @get_patient.json http://localhost:8080/v1/retrieve -i
 ```
-- do a GET request on /v1/retrieve with a body contains a JSON with following data
+- do a GET request on `/v1/retrieve` with a body contains a JSON with following data
 ```
 {
   "id": 100015,
