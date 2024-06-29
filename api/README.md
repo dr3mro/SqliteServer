@@ -34,6 +34,39 @@ $ curl -X POST -H "Content-Type: application/json" -d @user.json http://localhos
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MTk2NjI2MjksImlhdCI6MTcxOTY2MTcyOSwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.sDa6GIw-cve507uEth6tBfQ5OGfuAfxIl7P3JuSfS8c"
 }
 ```
+- a sucessful registeration will yield this result in json format.
+```
+HTTP/1.1 200 OK
+Content-Length: 133
+Server: ProjectValhalla
+Date: Sat, 29 Jun 2024 13:38:55 GMT
+Connection: Keep-Alive
+
+{
+    "response": [
+        {
+            "affected rows": 1
+        }
+    ],
+    "status id": 0,
+    "status message": "success"
+}%
+
+```
+- a failed regieration , for example user exists yields this results.
+```
+HTTP/1.1 400 Bad Request
+Content-Length: 130
+Server: ProjectValhalla
+Date: Sat, 29 Jun 2024 13:36:13 GMT
+Connection: Keep-Alive
+
+{
+    "response": "User already exists",
+    "status id": -1,
+    "status message": "Failed to create a new user, user exists"
+}%
+```
 - the "payload" value is verified on the server against SHA256SUM that should be generated and added to the JSON in sha256sum key.
 - in the next updates there would be a token for creating users and should be supplied with every registeration but for now its not being used, currently "payload" "sha256sum" are the only needed.
 - in the "payload" the username should only composed of lower case characters and numbers and not start with number and does not contains white spaces.
@@ -57,8 +90,160 @@ $ curl -X POST -H "Content-Type: application/json" -d @user.json http://localhos
 
 
 ### patient add
+```
+curl -X POST -H "Content-Type: application/json" -d @patient.json http://localhost:8080/v1/store -i
+```
+- In order to add a new user do a POST request in /v1/store with a body contains JSON like this.
+```
+{
+  "payload": {
+    "basic_data": {
+      "id": 0,
+      "firstname": "John",
+      "lastname": "Doe",
+      "date_of_birth": "1990-01-01",
+      "gender": "Male",
+      "place_of_birth": "New York",
+      "address": "123 Main St, Anytown, USA",
+      "occupation": "Engineer",
+      "contact": [
+        {
+          "email": "john.doe@example.com"
+        },
+        {
+          "phone": "+1987654321"
+        }
+      ]
+    },
+    "health_data": {
+    },
+    "appointments_data": {
+    }
+  },
+  "sha256sum": "81eaf148afea6c1c6577e518f6c5e9987a128b0e451670be9f3c171b91205b17",
+  "username": "amr_nasr",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MTk2NjI2MjksImlhdCI6MTcxOTY2MTcyOSwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.sDa6GIw-cve507uEth6tBfQ5OGfuAfxIl7P3JuSfS8c"
+}
+```
+- The payload should contain 3 item:
+  * "basic_data"
+  * "appointments_data"
+  * "health_data"
+- The basic_data should contains {"id" = 0}.
+- Providing empty value '{}' will clear the corresponding field i the database.
+- No providing a key for example "health_data" has no effect as only the provided data is processed.
+- The payload should be verified with sha256sum and the hash should be provided in the JSON as "sha256sum" value.
+- The username should exists and be valid.
+- The access token should be valid
+- A successful request will return the user_id and it looks like this.
+```
+HTTP/1.1 200 OK
+Content-Length: 180
+Server: ProjectValhalla
+Date: Sat, 29 Jun 2024 13:50:27 GMT
+Connection: Keep-Alive
+
+{
+    "response": [
+        {
+            "affected rows": 1
+        },
+        {
+            "id": 100018
+        }
+    ],
+    "status id": 0,
+    "status message": "success"
+}%
+```
+- A failed request for example if the token becomes expired would look like this.
+```
+HTTP/1.1 400 Bad Request
+Content-Length: 133
+Server: ProjectValhalla
+Date: Sat, 29 Jun 2024 13:49:52 GMT
+Connection: Keep-Alive
+
+{
+    "response": "authentication token invalidated",
+    "status id": -1,
+    "status message": "failed to create a new patient"
+}%
+```
 
 ### patient get
+```
+curl -X GET -H "Content-Type: application/json" -d @get_patient.json http://localhost:8080/v1/retrieve -i
+```
+- do a GET request on /v1/retrieve with a body contains a JSON with following data
+```
+{
+  "id": 100015,
+  "schema":[
+    "basic_data",
+    "health_data",
+    "appointments_data"
+  ],
+  "username": "amr_nasr",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MTk2Njk4OTksImlhdCI6MTcxOTY2ODk5OSwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.Ct9z0nLxdTCI1z3BclgjFQ0XZrBla3vwj_g30czZeGo"
+}
+```
+- A successful request looks like this:
+```
+HTTP/1.1 200 OK
+Content-Length: 784
+Server: ProjectValhalla
+Date: Sat, 29 Jun 2024 13:53:05 GMT
+Connection: Keep-Alive
+
+{
+    "response": [
+        {
+            "appointments_data": {},
+            "basic_data": {
+                "address": "123 Main St, Anytown, USA",
+                "contact": [
+                    {
+                        "email": "john.doe@example.com"
+                    },
+                    {
+                        "phone": "+1987654321"
+                    }
+                ],
+                "date_of_birth": "1990-01-01",
+                "firstname": "John",
+                "gender": "Male",
+                "id": 0,
+                "lastname": "Doe",
+                "occupation": "Engineer",
+                "place_of_birth": "New York"
+            },
+            "health_data": {}
+        }
+    ],
+    "status id": 0,
+    "status message": "success"
+}%
+```
+- A failed request due to for example expired access token looks something like this:
+```
+HTTP/1.1 400 Bad Request
+Content-Length: 117
+Server: ProjectValhalla
+Date: Sat, 29 Jun 2024 13:52:36 GMT
+Connection: Keep-Alive
+
+{
+    "response": "token is invalidated",
+    "status id": -1,
+    "status message": "failed to retrieve patient"
+}%
+```
+- the "schems" is an array of items you want to retrieve
+- you can request 1 or more or even 0 but I did not test this case yet.
+- the access token should be valid.
+- the username should be valid.
+- the 'id' is the patient_id and should exists
 
 ### patient update
  - WIP
