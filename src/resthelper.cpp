@@ -69,7 +69,7 @@ bool RestHelper::is_request_data_valid(const crow::request& req, crow::response&
 
         std::string sha256sum = data_json["sha256sum"].as<std::string>();
         std::string payload = data_json["payload"].as<std::string>();
-        std::cout << picosha2::hash256_hex_string(payload) << std::endl;
+        // std::cout << picosha2::hash256_hex_string(payload) << std::endl;
         if (sha256sum == picosha2::hash256_hex_string(payload)) {
             return true;
         }

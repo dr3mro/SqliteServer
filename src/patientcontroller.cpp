@@ -28,7 +28,7 @@ void PatientController::create_new_patient(const crow::request& req, crow::respo
         std::string token = data_json["token"].as<std::string>();
 
         if (!tokenizer.token_validator(token, username)) {
-            rHelper.respond_with_error(res, response_json, "failed to create a new patient", "authentication token invalidated", -1, 400);
+            rHelper.respond_with_error(res, response_json, "failed to create a new patient", "authentication token invalid or expired", -1, 400);
             return;
         }
 
@@ -42,36 +42,25 @@ void PatientController::create_new_patient(const crow::request& req, crow::respo
             return;
         }
 
-        // Extract keys from basic_data
-        std::vector<std::string> keys;
-        std::vector<std::string> values;
-        std::stringstream sql;
-
-        sql << "INSERT INTO patients (id";
+        std::vector<std::string> keys_arr;
+        std::vector<std::string> values_arr;
 
         for (auto it = data_json["payload"].object_range().begin(); it != data_json["payload"].object_range().end(); ++it) {
-            keys.push_back(it->key());
-            values.push_back(it->value().to_string());
+
+            if (it->key() == "basic_data" && it->value().contains("id")) {
+                it->value()["id"] = nextid;
+            }
+
+            keys_arr.push_back(it->key());
+            values_arr.push_back(it->value().as<std::string>());
         }
 
-        // Join keys with commas
-        bool first = true;
-        for (const auto& key : keys) {
-            sql << ", ";
-            sql << key;
-        }
+        std::string columns = fmt::format("{}", fmt::join(keys_arr, ","));
+        std::string values = fmt::format("'{}'", fmt::join(values_arr, "','"));
 
-        // Construct values for VALUES clause
-        sql << " ) VALUES ( " << nextid;
+        std::string query = fmt::format("INSERT INTO patients (id, {}) VALUES ({},{}) RETURNING id,{};", columns, nextid, values, columns);
 
-        for (const auto& value : values) {
-            sql << ", ";
-            sql << "'" << value << "'";
-        }
-
-        sql << " ) RETURNING id;";
-
-        json query_results_json = dbController.executeQuery(sql.str());
+        json query_results_json = dbController.executeQuery(query);
 
         rHelper.evaluate_response(response_json, query_results_json);
         rHelper.finish_response(res, 200, response_json);
