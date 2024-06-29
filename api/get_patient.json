@@ -1,0 +1,10 @@
+{
+  "id": 100010,
+  "schema":[
+    "basic_data",
+    "health_data",
+    "appointments_data"
+  ],
+  "username": "amr_nasr",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MTk2NjI2MjksImlhdCI6MTcxOTY2MTcyOSwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.sDa6GIw-cve507uEth6tBfQ5OGfuAfxIl7P3JuSfS8c"
+}

@@ -18,9 +18,7 @@ API_V1_Routes::API_V1_Routes(crow::SimpleApp& app, UserController& userControlle
 
     CROW_ROUTE(app, "/v1/retrieve")
         .methods("GET"_method)([&patientController](const crow::request& req, crow::response& res) {
-            // here we will check the header for token and if valid the check for a variable that specify
-            // the column and the id needed and it will be returned as json list of data from database
-            //
+            patientController.get_patient_data(std::ref(req), std::ref(res));
         });
 
     CROW_ROUTE(app, "/v1/store")
@@ -49,28 +47,6 @@ API_V1_Routes::API_V1_Routes(crow::SimpleApp& app, UserController& userControlle
         .methods("GET"_method)([&patientController](const crow::request& req, crow::response& res) {
             // here we will check the header for token and if valid the check for a query string in the database and return
             // list of results as json .. it will be expensive
-        });
-
-    ///////////////
-
-    CROW_ROUTE(app, "/api_v1/create_patient_basic_information")
-        .methods("POST"_method)([&patientController](const crow::request& req, crow::response& res) {
-            patientController.create_patient_basic_information(std::ref(req), std::ref(res));
-        });
-    // GET route example: /get/<int>
-    CROW_ROUTE(app, "/api_v1/read_patient_basic_information/<int>")
-        .methods("GET"_method)([&patientController](const crow::request& req, crow::response& res, uint64_t id) {
-            patientController.read_patient_basic_information(std::ref(req), std::ref(res), id);
-        });
-
-    CROW_ROUTE(app, "/api_v1/update_patient_basic_information/<int>")
-        .methods("POST"_method)([&patientController](const crow::request& req, crow::response& res, uint64_t id) {
-            patientController.update_patient_basic_information(std::ref(req), std::ref(res), id);
-        });
-
-    CROW_ROUTE(app, "/api_v1/delete_patient_basic_information/<int>")
-        .methods("GET"_method)([&patientController](const crow::request& req, crow::response& res, uint64_t id) {
-            patientController.delete_patient_basic_information(std::ref(req), std::ref(res), id);
         });
 
     CROW_CATCHALL_ROUTE(app)
