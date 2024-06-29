@@ -1,4 +1,12 @@
 # PROJECT VALHALLA
+
+ - Before testing make sure you clean all the old containers.
+```
+$ docker-compose down --rmi all --volumes
+$ docker-compose down --remove-orphans --volumes
+$ docker-compose up --build
+```
+
 ### user registeration
 ```
 $ curl -X POST -H "Content-Type: application/json" -d @user.json http://localhost:8080/v1/register -i
