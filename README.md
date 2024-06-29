@@ -1,86 +1,253 @@
-==================================================================================
+# PROJECT VALHALLA
+### user registeration
+```
+$ curl -X POST -H "Content-Type: application/json" -d @user.json http://localhost:8080/v1/register -i
+```
+- do a POST request on /v1/register with a body contains a JSON with following data
+```
+{
+  "payload": {
+    "fullname": "Amr Nasr",
+    "username": "amr_nasr",
+    "password": "123Mm@p0",
+    "role": 0,
+    "user_data": {
+      "contact": {
+        "phone": "+201299999999",
+        "email": "amr@mail.com"
+      },
+      "address": {
+        "city": "Damietta",
+        "street": "portsaid street"
+      },
+      "dob": "1990-10-10",
+      "gender": "male",
+      "married": true,
+      "job": {
+        "position": "Doctor",
+        "speciality": "Cardiology"
+      }
+    }
+  },
+  "sha256sum": "8657efb831ff66d61a6f26106a7acbe3f5a3bbc021b97fe1f1e4f69f21e20ec6",
+  "username": "admin",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MTk2NjI2MjksImlhdCI6MTcxOTY2MTcyOSwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.sDa6GIw-cve507uEth6tBfQ5OGfuAfxIl7P3JuSfS8c"
+}
+```
+- a sucessful registeration will yield this result in json format.
+```
+HTTP/1.1 200 OK
+Content-Length: 133
+Server: ProjectValhalla
+Date: Sat, 29 Jun 2024 13:38:55 GMT
+Connection: Keep-Alive
 
-docker network create valhalla-network
-docker-compose up --build
+{
+    "response": [
+        {
+            "affected rows": 1
+        }
+    ],
+    "status id": 0,
+    "status message": "success"
+}%
 
-curl -X POST -H "Content-Type: application/json" -d @dummy_patient.json http://localhost:8080/api_v1/create_patient_basic_information -i
-curl -X POST -H "Content-Type: application/json" -d @dummy_patient2.json http://localhost:8080/api_v1/create_patient_basic_information -i
-curl -X POST -H "Content-Type: application/json" -d @dummy_patient3.json http://localhost:8080/api_v1/create_patient_basic_information -i
-curl -X POST -H "Content-Type: application/json" -d @dummy_patient4.json http://localhost:8080/api_v1/create_patient_basic_information -i
+```
+- a failed regieration , for example user exists yields this results.
+```
+HTTP/1.1 400 Bad Request
+Content-Length: 130
+Server: ProjectValhalla
+Date: Sat, 29 Jun 2024 13:36:13 GMT
+Connection: Keep-Alive
 
-curl localhost:8080/api_v1/read_patient_basic_information/100000
-curl localhost:8080/api_v1/read_patient_basic_information/100001
-curl localhost:8080/api_v1/read_patient_basic_information/100002
-curl localhost:8080/api_v1/read_patient_basic_information/100003
+{
+    "response": "User already exists",
+    "status id": -1,
+    "status message": "Failed to create a new user, user exists"
+}%
+```
+- the "payload" value is verified on the server against SHA256SUM that should be generated and added to the JSON in sha256sum key.
+- in the next updates there would be a token for creating users and should be supplied with every registeration but for now its not being used, currently "payload" "sha256sum" are the only needed.
+- in the "payload" the username should only composed of lower case characters and numbers and not start with number and does not contains white spaces.
+- the password should contains upper and lower case characters, symbols, numbers and at lest 8 characters long.
+- the email should be in a valid format user@domain.ext
+- the role value is for now '0' as the role implementation is WIP.
 
-psql -U postgres -d postgres -h 172.20.0.3
-
-===================================================================================
-
-curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"id":1,"value":"Mohamed Ali"}' http://localhost:8080/post
-
-
-curl http://localhost:8080/get/1
-
-
-Build the Docker image:
-
-    docker build -t sqlserver .
-
-Run the Docker container:
-
-    docker run sqlserver
-
-Get docker ID
-    docker ps
-
-Get docker IPAddress
-    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' e584361f0545
-
-
-
-    docker pull postgres
-    docker volume create postgres_data
-    docker run --name postgres_container -e POSTGRES_PASSWORD=000 -d -p 5432:5432 -v postgres_data:/var/lib/postgresql/data postgres
+### user login
+```
+ curl -X POST -H "Content-Type: application/json" -d @login.json http://localhost:8080/v1/login -i
+```
+- do a POST request on /v1/login with a body contains a JSON with following data
+```
+{
+    "username" : "amr_nasr",
+    "password" : "123Mm@p0"
+}
+```
+- the username should be in lowecase and/or numbers and never contains spaces or symbols.
+- the password should be uppercase and lowercase and characters and symbols.
 
 
-To set up a Docker container running PostgreSQL with a static IP address, you typically need to create a Docker network and then attach your PostgreSQL container to that network with a specified IP address. Here’s a step-by-step guide to achieve this:
-Step 1: Create a Docker network
+### patient add
+```
+curl -X POST -H "Content-Type: application/json" -d @patient.json http://localhost:8080/v1/store -i
+```
+- In order to add a new user do a POST request in /v1/store with a body contains JSON like this.
+```
+{
+  "payload": {
+    "basic_data": {
+      "id": 0,
+      "firstname": "John",
+      "lastname": "Doe",
+      "date_of_birth": "1990-01-01",
+      "gender": "Male",
+      "place_of_birth": "New York",
+      "address": "123 Main St, Anytown, USA",
+      "occupation": "Engineer",
+      "contact": [
+        {
+          "email": "john.doe@example.com"
+        },
+        {
+          "phone": "+1987654321"
+        }
+      ]
+    },
+    "health_data": {
+    },
+    "appointments_data": {
+    }
+  },
+  "sha256sum": "81eaf148afea6c1c6577e518f6c5e9987a128b0e451670be9f3c171b91205b17",
+  "username": "amr_nasr",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MTk2NjI2MjksImlhdCI6MTcxOTY2MTcyOSwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.sDa6GIw-cve507uEth6tBfQ5OGfuAfxIl7P3JuSfS8c"
+}
+```
+- The payload should contain 3 item:
+  * "basic_data"
+  * "appointments_data"
+  * "health_data"
+- The basic_data should contains {"id" = 0}.
+- Providing empty value '{}' will clear the corresponding field i the database.
+- No providing a key for example "health_data" has no effect as only the provided data is processed.
+- The payload should be verified with sha256sum and the hash should be provided in the JSON as "sha256sum" value.
+- The username should exists and be valid.
+- The access token should be valid
+- A successful request will return the user_id and it looks like this.
+```
+HTTP/1.1 200 OK
+Content-Length: 180
+Server: ProjectValhalla
+Date: Sat, 29 Jun 2024 13:50:27 GMT
+Connection: Keep-Alive
 
-First, create a Docker network that will be used for your PostgreSQL container. This allows you to have control over IP address assignment.
+{
+    "response": [
+        {
+            "affected rows": 1
+        },
+        {
+            "id": 100018
+        }
+    ],
+    "status id": 0,
+    "status message": "success"
+}%
+```
+- A failed request for example if the token becomes expired would look like this.
+```
+HTTP/1.1 400 Bad Request
+Content-Length: 133
+Server: ProjectValhalla
+Date: Sat, 29 Jun 2024 13:49:52 GMT
+Connection: Keep-Alive
 
-bash
+{
+    "response": "authentication token invalidated",
+    "status id": -1,
+    "status message": "failed to create a new patient"
+}%
+```
 
-docker network create --subnet=192.168.100.0/24 postgres-network
+### patient get
+```
+curl -X GET -H "Content-Type: application/json" -d @get_patient.json http://localhost:8080/v1/retrieve -i
+```
+- do a GET request on /v1/retrieve with a body contains a JSON with following data
+```
+{
+  "id": 100015,
+  "schema":[
+    "basic_data",
+    "health_data",
+    "appointments_data"
+  ],
+  "username": "amr_nasr",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MTk2Njk4OTksImlhdCI6MTcxOTY2ODk5OSwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.Ct9z0nLxdTCI1z3BclgjFQ0XZrBla3vwj_g30czZeGo"
+}
+```
+- A successful request looks like this:
+```
+HTTP/1.1 200 OK
+Content-Length: 784
+Server: ProjectValhalla
+Date: Sat, 29 Jun 2024 13:53:05 GMT
+Connection: Keep-Alive
 
-Replace 192.168.100.0/24 with the subnet you want to use for your network.
-Step 2: Run the PostgreSQL container
+{
+    "response": [
+        {
+            "appointments_data": {},
+            "basic_data": {
+                "address": "123 Main St, Anytown, USA",
+                "contact": [
+                    {
+                        "email": "john.doe@example.com"
+                    },
+                    {
+                        "phone": "+1987654321"
+                    }
+                ],
+                "date_of_birth": "1990-01-01",
+                "firstname": "John",
+                "gender": "Male",
+                "id": 0,
+                "lastname": "Doe",
+                "occupation": "Engineer",
+                "place_of_birth": "New York"
+            },
+            "health_data": {}
+        }
+    ],
+    "status id": 0,
+    "status message": "success"
+}%
+```
+- A failed request due to for example expired access token looks something like this:
+```
+HTTP/1.1 400 Bad Request
+Content-Length: 117
+Server: ProjectValhalla
+Date: Sat, 29 Jun 2024 13:52:36 GMT
+Connection: Keep-Alive
 
-Now, run a PostgreSQL container and attach it to the network with a static IP address.
+{
+    "response": "token is invalidated",
+    "status id": -1,
+    "status message": "failed to retrieve patient"
+}%
+```
+- the "schems" is an array of items you want to retrieve
+- you can request 1 or more or even 0 but I did not test this case yet.
+- the access token should be valid.
+- the username should be valid.
+- the 'id' is the patient_id and should exists
 
-bash
-
-docker run --name postgres-container --net postgres-network --ip 192.168.100.10 \
-    -e POSTGRES_PASSWORD=mysecretpassword -d postgres
-
-    --name postgres-container: Assigns a name to the container for easier management.
-    --net postgres-network: Attaches the container to the postgres-network network.
-    --ip 192.168.100.10: Specifies the static IP address you want to assign to the container.
-    -e POSTGRES_PASSWORD=mysecretpassword: Sets the PostgreSQL database password. You can adjust other environment variables (POSTGRES_USER, etc.) as needed for your setup.
-    -d postgres: Specifies the Docker image to use (in this case, the official PostgreSQL image).
-
-Step 3: Verify connectivity
-
-Once the container is running, you can verify connectivity by connecting to the PostgreSQL database from another container or from the host machine using the specified static IP address (192.168.100.10 in this example).
-
-bash
-
-psql -h 192.168.100.10 -U postgres
-
-Notes:
-
-    Networking: Make sure the chosen subnet (192.168.100.0/24 in the example) does not conflict with your existing network configuration.
-    Static IP Assignment: Docker does not natively support assigning static IPs directly through container creation options, but this method effectively achieves the same result by creating a custom network and specifying the IP.
-    Persistence: For persistent data, consider using Docker volumes to store PostgreSQL data outside the container.
-
-By following these steps, you can set up a PostgreSQL container with a static IP address within Docker, providing predictable networking for your applications. Adjust the IP addresses and network settings according to your specific requirements and network configuration.
+### patient update
+ - WIP
+### patient delete
+ - WIP
+### patient search
+ - WIP
