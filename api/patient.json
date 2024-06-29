@@ -2,19 +2,28 @@
   "payload": {
     "basic_data": {
       "id": 0,
-      "name": "John Doe",
+      "firstname": "John",
+      "lastname": "Doe",
       "date_of_birth": "1990-01-01",
       "gender": "Male",
       "place_of_birth": "New York",
       "address": "123 Main St, Anytown, USA",
       "occupation": "Engineer",
-      "email": "john.doe@example.com",
-      "phone": "+1987654321"
+      "contact": [
+        {
+          "email": "john.doe@example.com"
+        },
+        {
+          "phone": "+1987654321"
+        }
+      ]
     },
-    "health_data": {},
-    "apponitments_data": {}
+    "health_data": {
+    },
+    "appointments_data": {
+    }
   },
-  "sha256sum": "bad2756256576a56vs65v65a67v576a5v7a6576va5a765av7",
+  "sha256sum": "81eaf148afea6c1c6577e518f6c5e9987a128b0e451670be9f3c171b91205b17",
   "username": "amr_nasr",
-  "token": "hkhkjhkdhfkjkehohfoalfhahlskhlkdhlkshdlkhslhflkhf.alalshhjkhfksjhfkjhkjfhjkafhskjshkjhakjdhkjhskjfkjasf.afjskjhkjhkjfshakjfhkjfahkjshkfjshkjhfkjhf"
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MTk2NjI2MjksImlhdCI6MTcxOTY2MTcyOSwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.sDa6GIw-cve507uEth6tBfQ5OGfuAfxIl7P3JuSfS8c"
 }

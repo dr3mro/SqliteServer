@@ -61,21 +61,23 @@ bool UserController::Impl::is_email_pattern_valid(const std::string& email)
 bool UserController::Impl::extract_and_sanity_check_user_registration_data(UserRegistrationData& userRegistrationData, json& userdata_json, json& response_json, crow::response& res)
 {
     // Extract the username from the JSON
-    userRegistrationData.username = userdata_json["username"].as<std::string>();
+    json payload = userdata_json["payload"];
+
+    userRegistrationData.username = payload["username"].as<std::string>();
 
     // Check username pattern
     if (is_username_pattern_valid(userRegistrationData.username)) {
-        userdata_json.erase("username");
+        payload.erase("username");
     } else {
         rHelper.respond_with_error(res, response_json, "Failed to create a new user, invalid username", "Username should always be in lowercase characters and underscore or numbers only", -1, 400);
         return false;
     }
 
     // Check password pattern
-    std::string password = userdata_json["password"].as<std::string>();
+    std::string password = payload["password"].as<std::string>();
 
     if (is_password_pattern_valid(password)) {
-        userdata_json.erase("password");
+        payload.erase("password");
     } else {
         rHelper.respond_with_error(res, response_json, "Failed to create a new user, invalid password", "Password is weak", -1, 400);
         return false;
@@ -85,10 +87,10 @@ bool UserController::Impl::extract_and_sanity_check_user_registration_data(UserR
     userRegistrationData.password_hash = picosha2::hash256_hex_string(password);
 
     // Extract the role, user_data, and email for further validation
-    userRegistrationData.role = userdata_json["role"].as<std::string>();
-    userRegistrationData.user_data = userdata_json["user_data"].as<std::string>();
+    userRegistrationData.role = payload["role"].as<std::string>();
+    userRegistrationData.user_data = payload["user_data"].as<std::string>();
 
-    std::string email = userdata_json["user_data"]["contact"]["email"].as<std::string>();
+    std::string email = payload["user_data"]["contact"]["email"].as<std::string>();
 
     // Check if username contains spaces
     if (is_string_contains_spaces(userRegistrationData.username)) {
@@ -201,7 +203,6 @@ void UserController::login_user(const crow::request& req, crow::response& res)
     // Parse the JSON and extract the data
     try {
         // Get the JSON from request body
-
         std::string username = data_json["username"].as<std::string>();
         std::string password = data_json["password"].as<std::string>();
 

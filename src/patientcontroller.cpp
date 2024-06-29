@@ -22,11 +22,8 @@ void PatientController::create_new_patient(const crow::request& req, crow::respo
         }
 
         // User authentication check
-        std::string authorization = req.get_header_value("Authorization");
-        std::string token = authorization.substr(7);
         std::string username = data_json["username"].as<std::string>();
-
-        std::cout << token << '\n';
+        std::string token = data_json["token"].as<std::string>();
 
         if (!tokenizer.token_validator(token, username)) {
             rHelper.respond_with_error(res, response_json, "failed to create a new patient", "authentication token invalidated", -1, 400);
@@ -43,17 +40,39 @@ void PatientController::create_new_patient(const crow::request& req, crow::respo
             return;
         }
 
-        json payload_json = data_json["payload"];
-        payload_json["basic_data"]["id"] = nextid;
+        // Extract keys from basic_data
+        std::vector<std::string> keys;
+        std::vector<std::string> values;
+        std::stringstream sql;
 
-        std::string query = fmt::format("INSERT INTO patients (id,{},{},{}) VALUES ('{}','{}','{}','{}' ) RETURNING basic_data;",
-            "basic_data", "health_data", "appointments_data", nextid, payload_json["basic_data"].to_string(), payload_json["health_data"].to_string(), payload_json["appointments_data"].to_string());
+        sql << "INSERT INTO patients (id";
 
-        json query_results_json = dbController.executeQuery(query);
+        for (auto it = data_json["payload"].object_range().begin(); it != data_json["payload"].object_range().end(); ++it) {
+            keys.push_back(it->key());
+            values.push_back(it->value().to_string());
+        }
+
+        // Join keys with commas
+        bool first = true;
+        for (const auto& key : keys) {
+            sql << ", ";
+            sql << key;
+        }
+
+        // Construct values for VALUES clause
+        sql << " ) VALUES ( " << nextid;
+
+        for (const auto& value : values) {
+            sql << ", ";
+            sql << "'" << value << "'";
+        }
+
+        sql << " ) RETURNING id;";
+
+        json query_results_json = dbController.executeQuery(sql.str());
 
         rHelper.evaluate_response(response_json, query_results_json);
         rHelper.finish_response(res, 200, response_json);
-
     } catch (const std::exception& e) {
         // Handle exception (log, etc.)
         rHelper.format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));

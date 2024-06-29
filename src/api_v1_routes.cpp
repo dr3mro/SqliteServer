@@ -25,14 +25,10 @@ API_V1_Routes::API_V1_Routes(crow::SimpleApp& app, UserController& userControlle
 
     CROW_ROUTE(app, "/v1/store")
         .methods("POST"_method)([&patientController](const crow::request& req, crow::response& res) {
-            // here we will check the header for token and if valid the check for a variable that specify
-            // the operation either create or update then we check if the id exsists and check the column and
-            // the id needed and it will be store the json list of data into database and if the variable = delete
-            // then we check the user role and delete patient
-            //
+            patientController.create_new_patient(std::ref(req), std::ref(res));
         });
     CROW_ROUTE(app, "/v1/store")
-        .methods("PUT"_method)([&patientController](const crow::request& req, crow::response& res) {
+        .methods("PATCH"_method)([&patientController](const crow::request& req, crow::response& res) {
             // here we will check the header for token and if valid the check for a variable that specify
             // the operation either create or update then we check if the id exsists and check the column and
             // the id needed and it will be store the json list of data into database and if the variable = delete

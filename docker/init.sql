@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS patients (
     id INTEGER PRIMARY KEY DEFAULT nextval('patient_id_seq'),
     basic_data JSONB,
     health_data JSONB,
-    apponitments_data JSONB,
+    appointments_data JSONB,
     created_on timestamptz DEFAULT current_timestamp,
     updated_on timestamptz DEFAULT current_timestamp
 );
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS patients (
 CREATE TABLE users (
     user_id INTEGER PRIMARY KEY DEFAULT nextval('user_id_seq'),
     username VARCHAR(100) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL
+    password_hash VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL,
     user_data JSONB
 );
@@ -34,7 +34,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER patients_basic_data_table_updated_on
-BEFORE UPDATE ON patients_basic_data
+CREATE TRIGGER patients_table_updated_on
+BEFORE UPDATE ON patients
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_on_column();

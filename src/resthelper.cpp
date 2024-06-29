@@ -59,18 +59,24 @@ bool RestHelper::is_request_data_valid(const crow::request& req, crow::response&
     // Try to parse json and throw error if invalid json and if parsed check integreity by claculating sha256
     try {
         data_json = json::parse(req.body);
-        std::string sha256sum = data_json["sha256sum"].as<std::string>();
-        std::string payload = data_json["payload"].as<std::string>();
 
-        if (sha256sum != picosha2::hash256_hex_string(payload)) {
+        if (!data_json.contains("sha256sum")) {
+            return false;
+        }
+        if (!data_json.contains("payload")) {
             return false;
         }
 
-        return true;
+        std::string sha256sum = data_json["sha256sum"].as<std::string>();
+        std::string payload = data_json["payload"].as<std::string>();
+        std::cout << picosha2::hash256_hex_string(payload) << std::endl;
+        if (sha256sum == picosha2::hash256_hex_string(payload)) {
+            return true;
+        }
     } catch (const std::exception& e) {
-        respond_with_error(res, response_json, "Failed to create a new user, invalid JSON", fmt::format("Error parsing user data: {}", e.what()), -1, 400);
-        return false;
+        respond_with_error(res, response_json, "Failure, invalid JSON", fmt::format("Error parsing data: {}", e.what()), -1, 400);
     }
+    return false;
 }
 bool RestHelper::is_login_data_valid(const crow::request& req, crow::response& res, json& response_json, json& data_json)
 {
