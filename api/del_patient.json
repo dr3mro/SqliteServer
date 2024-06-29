@@ -1,0 +1,13 @@
+{
+  "payload": {
+    "basic_data": {
+      "id": 100009,
+      "firstname": "John",
+      "lastname": "Doe",
+      "date_of_birth": "1990-01-01",
+      "gender": "Male"
+  },
+  "sha256sum": "81eaf148afea6c1c6577e518f6c5e9987a128b0e451670be9f3c171b91205b17",
+  "username": "amr_nasr",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MTk2OTgzNDAsImlhdCI6MTcxOTY5NzQ0MCwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.2TOQNIIk-0gDxCSpNpHxVZOeN1u503viTHt8ezbcYDI"
+}

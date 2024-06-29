@@ -2,7 +2,7 @@
 
 start_time=$(date +%s)
 
-for i in {100000..110000}; do
+for i in {1..500}; do
   curl --silent -o /dev/null -X GET -H "Content-Type: application/json" -d @get_patient.json http://172.20.0.2:8080/v1/retrieve -i &
 done
 
