@@ -153,20 +153,22 @@ UserController::~UserController()
 void UserController::register_user(const crow::request& req, crow::response& res)
 {
     json response_json;
-    // Check JSON validity
-    if (!pImpl->rHelper.is_request_data_valid(req, res, response_json)) {
+    json data_json;
+
+    // Check JSON validity and assign it to data_json of valid
+
+    if (!pImpl->rHelper.is_request_data_valid(req, res, response_json, data_json)) {
         return;
     }
 
     // Parse the JSON and extract the data
     try {
         // Get the JSON from request body
-        auto userdata_json = json::parse(req.body);
 
         Impl::UserRegistrationData userRegistrationData;
 
         // Extract and validate user registration data
-        if (!pImpl->extract_and_sanity_check_user_registration_data(userRegistrationData, userdata_json, response_json, res)) {
+        if (!pImpl->extract_and_sanity_check_user_registration_data(userRegistrationData, data_json, response_json, res)) {
             return;
         }
 
@@ -190,18 +192,18 @@ void UserController::register_user(const crow::request& req, crow::response& res
 void UserController::login_user(const crow::request& req, crow::response& res)
 {
     json response_json;
+    json data_json;
     // Check JSON validity
-    if (!pImpl->rHelper.is_request_data_valid(req, res, response_json)) {
+    if (!pImpl->rHelper.is_login_data_valid(req, res, response_json, data_json)) {
         return;
     }
 
     // Parse the JSON and extract the data
     try {
         // Get the JSON from request body
-        auto userdata_json = json::parse(req.body);
 
-        std::string username = userdata_json["username"].as<std::string>();
-        std::string password = userdata_json["password"].as<std::string>();
+        std::string username = data_json["username"].as<std::string>();
+        std::string password = data_json["password"].as<std::string>();
 
         uint64_t user_id = pImpl->authenticate_user(username, password);
 

@@ -12,26 +12,48 @@ PatientController::PatientController(DatabaseController& dbController, RestHelpe
 void PatientController::create_new_patient(const crow::request& req, crow::response& res)
 {
     json response_json;
-    auto basic_data_json = json::parse(req.body);
 
     try {
-        uint64_t nextid = rHelper.get_next_patient_id();
+        // Data Integrity check
+        json data_json;
+        if (!rHelper.is_request_data_valid(req, res, response_json, data_json)) {
+            rHelper.respond_with_error(res, response_json, "failed to create a new patient", "payload integrity check failed", -1, 400);
+            return;
+        }
+
+        // User authentication check
+        std::string authorization = req.get_header_value("Authorization");
+        std::string token = authorization.substr(7);
+        std::string username = data_json["username"].as<std::string>();
+
+        std::cout << token << '\n';
+
+        if (!tokenizer.token_validator(token, username)) {
+            rHelper.respond_with_error(res, response_json, "failed to create a new patient", "authentication token invalidated", -1, 400);
+            return;
+        }
+
+        // Find the next ID
+        uint64_t nextid
+            = rHelper.get_next_patient_id();
 
         if (nextid == 0) {
             rHelper.format_response(response_json, -1, "failed to create a new patient", "failed to get nextval");
             rHelper.finish_response(res, 401, response_json);
+            return;
         }
 
-        basic_data_json["id"] = nextid;
-        // Construct SQL query using {fmt} for parameterized query
-        std::string query
-            = fmt::format("INSERT INTO patients_basic_data (id, basic_data) VALUES ('{}','{}') RETURNING basic_data;",
-                nextid, basic_data_json.to_string());
+        json payload_json = data_json["payload"];
+        payload_json["basic_data"]["id"] = nextid;
 
-        // Execute the query using DatabaseHandler
+        std::string query = fmt::format("INSERT INTO patients (id,{},{},{}) VALUES ('{}','{}','{}','{}' ) RETURNING basic_data;",
+            "basic_data", "health_data", "appointments_data", nextid, payload_json["basic_data"].to_string(), payload_json["health_data"].to_string(), payload_json["appointments_data"].to_string());
+
         json query_results_json = dbController.executeQuery(query);
+
         rHelper.evaluate_response(response_json, query_results_json);
         rHelper.finish_response(res, 200, response_json);
+
     } catch (const std::exception& e) {
         // Handle exception (log, etc.)
         rHelper.format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));

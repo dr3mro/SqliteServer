@@ -1,0 +1,28 @@
+{
+  "payload": {
+    "fullname": "Amr Nasr",
+    "username": "amr_nasr",
+    "password": "123Mm@p0",
+    "role": 0,
+    "user_data": {
+      "contact": {
+        "phone": "+201299999999",
+        "email": "amr@mail.com"
+      },
+      "address": {
+        "city": "Damietta",
+        "street": "portsaid street"
+      },
+      "dob": "1990-10-10",
+      "gender": "male",
+      "married": true,
+      "job": {
+        "position": "Doctor",
+        "speciality": "Cardiology"
+      }
+    }
+  },
+  "sha256sum": "kha9a6s87a6s876a87s6a87s6a876s87a5sa65sa65s76a5s76576",
+  "username": "username",
+  "token": "tyurrytrytrytrytrytgfhgfhgfhgfhgfdgfdgfxbvxbvchghdg.kggjjfjfhgdrsttsrsgfxgfx.fyuyruyrur76r76r76r67r76r7"
+}

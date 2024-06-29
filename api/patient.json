@@ -1,17 +1,20 @@
 {
-  "basic_data": {
-    "id": 0,
-    "name": "John Doe",
-    "date_of_birth": "1990-01-01",
-    "gender": "Male",
-    "place_of_birth": "New York",
-    "address": "123 Main St, Anytown, USA",
-    "occupation": "Engineer",
-    "email": "john.doe@example.com",
-    "phone": "+1987654321"
+  "payload": {
+    "basic_data": {
+      "id": 0,
+      "name": "John Doe",
+      "date_of_birth": "1990-01-01",
+      "gender": "Male",
+      "place_of_birth": "New York",
+      "address": "123 Main St, Anytown, USA",
+      "occupation": "Engineer",
+      "email": "john.doe@example.com",
+      "phone": "+1987654321"
+    },
+    "health_data": {},
+    "apponitments_data": {}
   },
-  "health_data": {},
-  "apponitments_data": {},
-  "checksum": "bad2756256576a56vs65v65a67v576a5v7a6576va5a765av7",
-  "username": "amr_nasr"
+  "sha256sum": "bad2756256576a56vs65v65a67v576a5v7a6576va5a765av7",
+  "username": "amr_nasr",
+  "token": "hkhkjhkdhfkjkehohfoalfhahlskhlkdhlkshdlkhslhflkhf.alalshhjkhfksjhfkjhkjfhjkafhskjshkjhakjdhkjhskjfkjasf.afjskjhkjhkjfshakjfhkjfahkjshkfjshkjhfkjhf"
 }

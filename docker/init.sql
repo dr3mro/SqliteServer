@@ -7,7 +7,7 @@ CREATE SEQUENCE user_id_seq START 1000;
 
 
 -- Create the table with correct usage of sequence for id column
-CREATE TABLE IF NOT EXISTS patients_basic_data (
+CREATE TABLE IF NOT EXISTS patients (
     id INTEGER PRIMARY KEY DEFAULT nextval('patient_id_seq'),
     basic_data JSONB,
     health_data JSONB,
