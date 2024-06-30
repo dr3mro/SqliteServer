@@ -10,7 +10,7 @@ $ docker-compose up --build
 ### 🧪 Verify the server is running
 
 ```
-curl -X GET -H "Content-Type: application/json" -d @user.json http://172.20.0.2:8080/v1/hello -i
+curl http://172.20.0.2:8080/v1/hello
 ```
 - if you get this reply `Welcome to ASGARD.%` that means the server is up and running
 ### 🚦 Resource not found
