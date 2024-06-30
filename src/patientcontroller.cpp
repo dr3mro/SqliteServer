@@ -11,7 +11,7 @@ PatientController::PatientController(DatabaseController& dbController, RestHelpe
 {
 }
 
-void PatientController::create_new_patient(const crow::request& req, crow::response& res)
+void PatientController::create_patient(const crow::request& req, crow::response& res)
 {
     json response_json;
 
@@ -71,7 +71,7 @@ void PatientController::create_new_patient(const crow::request& req, crow::respo
     }
 }
 
-void PatientController::get_patient_data(const crow::request& req, crow::response& res)
+void PatientController::read_patient(const crow::request& req, crow::response& res)
 {
     json response_json;
     try {
@@ -119,24 +119,48 @@ void PatientController::get_patient_data(const crow::request& req, crow::respons
     }
 }
 
-void PatientController::update_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
+void PatientController::update_patient(const crow::request& req, crow::response& res)
 {
     json response_json;
 
-    auto basic_data_json = json::parse(req.body);
-
     try {
-        // Construct SQL query using {fmt} for parameterized query
-        std::string query
-            = fmt::format("UPDATE patients_basic_data SET basic_data = '{}' WHERE id = '{}' RETURNING basic_data;",
-                basic_data_json.to_string(), id);
+        // Data Integrity check
+        json data_json;
+        if (!rHelper.is_request_data_valid(req, res, response_json, data_json)) {
+            rHelper.respond_with_error(res, response_json, "failed to update patient", "payload integrity check failed", -1, 400);
+            return;
+        }
 
-        // Execute the query using DatabaseHandler
+        // User authentication check
+        std::string username = data_json["username"].as<std::string>();
+        std::string token = data_json["token"].as<std::string>();
+
+        if (!tokenizer.token_validator(token, username)) {
+            rHelper.respond_with_error(res, response_json, "failed to update patient", "authentication token invalid or expired", -1, 400);
+            return;
+        }
+
+        json payload = data_json["payload"];
+        json basic_data = payload["basic_data"];
+        uint64_t id = basic_data["id"].as<uint64_t>();
+
+        std::string update_column_values;
+
+        for (auto it = payload.object_range().begin(); it != payload.object_range().end(); ++it) {
+            update_column_values.append(fmt::format(" {} = '{}' ", it->key(), it->value().as<std::string>()));
+            if (std::next(it) != payload.object_range().end()) {
+                update_column_values.append(",");
+            }
+        }
+
+        std::string query = fmt::format("UPDATE patients set {} WHERE id={};", update_column_values, id);
+
+        std::cout << query << std::endl;
+
         json query_results_json = dbController.executeQuery(query);
 
         rHelper.evaluate_response(response_json, query_results_json);
         rHelper.finish_response(res, 200, response_json);
-
     } catch (const std::exception& e) {
         // Handle exception (log, etc.)
         rHelper.format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
@@ -186,4 +210,8 @@ void PatientController::delete_patient(const crow::request& req, crow::response&
         rHelper.format_response(response_json, -2, "failure", fmt::format("failed: {}", e.what()));
         rHelper.finish_response(res, 500, response_json);
     }
+}
+
+void PatientController::search_patient(const crow::request& req, crow::response& res)
+{
 }

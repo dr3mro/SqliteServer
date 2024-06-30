@@ -10,11 +10,12 @@ class PatientController {
 public:
     PatientController(DatabaseController& dbController, RestHelper& rHelper, Tokenizer& tokenizer);
 
-    void create_new_patient(const crow::request& req, crow::response& res);
-    void get_patient_data(const crow::request& req, crow::response& res);
-
-    void update_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id);
+    // CRUDS
+    void create_patient(const crow::request& req, crow::response& res);
+    void read_patient(const crow::request& req, crow::response& res);
+    void update_patient(const crow::request& req, crow::response& res);
     void delete_patient(const crow::request& req, crow::response& res);
+    void search_patient(const crow::request& req, crow::response& res);
 
 private:
     DatabaseController& dbController;

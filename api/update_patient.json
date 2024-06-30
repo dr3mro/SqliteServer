@@ -1,0 +1,29 @@
+{
+  "payload": {
+    "basic_data": {
+      "id": 100001,
+      "firstname": "Mark",
+      "lastname": "Johnson",
+      "date_of_birth": "1990-01-01",
+      "gender": "Male",
+      "place_of_birth": "Philadilphia",
+      "address": "123 Main St, Anytown, USA",
+      "occupation": "Nurse",
+      "contact": [
+        {
+          "email": "mark@example.com"
+        },
+        {
+          "phone": "+1987654321"
+        }
+      ]
+    },
+    "health_data": {
+    },
+    "appointments_data": {
+    }
+  },
+  "sha256sum": "a57ba46b2f25823cbdbb69a839dd9db9cee7c6fb303302498a7e0516a3431315",
+  "username": "amr_nasr",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MjIzNDkxMzUsImlhdCI6MTcxOTc1NzEzNSwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.nMye8-rcyOIsbGqF4iNu0eXj-lxJ83puSh7hIdbYvHA"
+}

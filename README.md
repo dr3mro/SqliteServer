@@ -319,8 +319,80 @@ Connection: Keep-Alive
 - the username should be valid.
 - the 'id' is the patient_id and should exists
 
-### 👍🏻 patient update
- - WIP
+### 👍🏻 Update a patient
+```
+curl -X PATCH -H "Content-Type: application/json" -d @update_patient.json http://172.20.0.2:8080/v1/patient -i
+```
+- In order to update a patient do a PATCH request in `/v1/patient` with a body contains JSON like this.
+```
+{
+  "payload": {
+    "basic_data": {
+      "id": 100001,
+      "firstname": "Mark",
+      "lastname": "Johnson",
+      "date_of_birth": "1990-01-01",
+      "gender": "Male",
+      "place_of_birth": "Philadilphia",
+      "address": "123 Main St, Anytown, USA",
+      "occupation": "Nurse",
+      "contact": [
+        {
+          "email": "mark@example.com"
+        },
+        {
+          "phone": "+1987654321"
+        }
+      ]
+    },
+    "health_data": {
+    },
+    "appointments_data": {
+    }
+  },
+  "sha256sum": "a57ba46b2f25823cbdbb69a839dd9db9cee7c6fb303302498a7e0516a3431315",
+  "username": "amr_nasr",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MjIzNDkxMzUsImlhdCI6MTcxOTc1NzEzNSwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.nMye8-rcyOIsbGqF4iNu0eXj-lxJ83puSh7hIdbYvHA"
+}
+```
+- a successful delete reply with a json like this
+```
+HTTP/1.1 200 OK
+Content-Length: 133
+Server: ProjectValhalla
+Date: Sun, 30 Jun 2024 19:47:04 GMT
+Connection: Keep-Alive
+
+{
+    "response": [
+        {
+            "affected rows": 1
+        }
+    ],
+    "status id": 0,
+    "status message": "success"
+}%
+```
+- a failed request might be for example due to patient not found would look like this
+```
+HTTP/1.1 200 OK
+Content-Length: 134
+Server: ProjectValhalla
+Date: Sun, 30 Jun 2024 19:52:33 GMT
+Connection: Keep-Alive
+
+{
+    "response": [
+        {
+            "affected rows": 0
+        }
+    ],
+    "status id": -1,
+    "status message": "failure"
+}%
+```
+- Notice that it returns 200 OK but affected records 0 that means every step was successful except the query to the database.
+
 ### ❌ Delete a patient
   ```
   curl -X DELETE -H "Content-Type: application/json" -d @del_patient.json http://172.20.0.2:8080/v1/patient -i

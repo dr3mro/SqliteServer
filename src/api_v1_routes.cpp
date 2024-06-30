@@ -18,21 +18,17 @@ API_V1_Routes::API_V1_Routes(crow::SimpleApp& app, UserController& userControlle
 
     CROW_ROUTE(app, "/v1/patient")
         .methods(crow::HTTPMethod::POST)([&patientController](const crow::request& req, crow::response& res) {
-            patientController.create_new_patient(std::ref(req), std::ref(res));
+            patientController.create_patient(std::ref(req), std::ref(res));
         });
 
     CROW_ROUTE(app, "/v1/patient")
         .methods(crow::HTTPMethod::GET)([&patientController](const crow::request& req, crow::response& res) {
-            patientController.get_patient_data(std::ref(req), std::ref(res));
+            patientController.read_patient(std::ref(req), std::ref(res));
         });
 
     CROW_ROUTE(app, "/v1/patient")
         .methods(crow::HTTPMethod::PATCH)([&patientController](const crow::request& req, crow::response& res) {
-            // here we will check the header for token and if valid the check for a variable that specify
-            // the operation either create or update then we check if the id exsists and check the column and
-            // the id needed and it will be store the json list of data into database and if the variable = delete
-            // then we check the user role and delete patient
-            //
+            patientController.update_patient(std::ref(req), std::ref(res));
         });
 
     CROW_ROUTE(app, "/v1/patient")
@@ -42,8 +38,7 @@ API_V1_Routes::API_V1_Routes(crow::SimpleApp& app, UserController& userControlle
 
     CROW_ROUTE(app, "/v1/patient")
         .methods(crow::HTTPMethod::SEARCH)([&patientController](const crow::request& req, crow::response& res) {
-            // here we will check the header for token and if valid the check for a query string in the database and return
-            // list of results as json .. it will be expensive
+            patientController.search_patient(std::ref(req), std::ref(res));
         });
 
     CROW_ROUTE(app, "/v1/hello")
