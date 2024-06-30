@@ -1,10 +1,11 @@
 # 🚀 PROJECT VALHALLA
 
  - Before testing make sure you clean all the old containers.
+ - cd into $PROJECT_DIR/docker and run those commands
 ```
-$ docker-compose down --rmi all --volumes
-$ docker-compose down --remove-orphans --volumes
-$ docker-compose up --build
+docker compose down --rmi all --volumes
+docker compose down --remove-orphans --volumes
+docker compose up --build
 ```
 
 ### 🧪 Verify the server is running
