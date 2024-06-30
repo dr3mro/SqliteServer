@@ -1,4 +1,4 @@
-# PROJECT VALHALLA
+# 🚀 PROJECT VALHALLA
 
  - Before testing make sure you clean all the old containers.
 ```
@@ -7,11 +7,25 @@ $ docker-compose down --remove-orphans --volumes
 $ docker-compose up --build
 ```
 
-### user registeration
+### 🧪 Verify the server is running
+
 ```
-$ curl -X POST -H "Content-Type: application/json" -d @user.json http://172.20.0.2:8080/v1/register -i
+curl -X GET -H "Content-Type: application/json" -d @user.json http://172.20.0.2:8080/v1/hello -i
 ```
-- do a POST request on `/v1/register` with a body contains a JSON with following data
+- if you get this reply `Welcome to ASGARD.%` that means the server is up and running
+### 🚦 Resource not found
+- if for any reason the server did not find the requested end point it will display this message
+
+```
+NOT FOUND, Are you lost?%
+```
+
+
+### 🎉 Create a new User
+```
+curl -X POST -H "Content-Type: application/json" -d @user.json http://172.20.0.2:8080/v1/user -i
+```
+- do a POST request on `/v1/user` with a body contains a JSON with following data
 ```
 {
   "payload": {
@@ -82,11 +96,11 @@ Connection: Keep-Alive
 - the email should be in a valid format user@domain.ext
 - the role value is for now '0' as the role implementation is WIP.
 
-### user login
+### 🚪 Login
 ```
- curl -X POST -H "Content-Type: application/json" -d @login.json http://172.20.0.2:8080/v1/login -i
+ curl -X GET -H "Content-Type: application/json" -d @login.json http://172.20.0.2:8080/v1/user -i
 ```
-- do a POST request on `/v1/login` with a body contains a JSON with following data
+- do a GET request on `/v1/user` with a body contains a JSON with following data
 ```
 {
     "username" : "amr_nasr",
@@ -128,11 +142,11 @@ Connection: Keep-Alive
 ``
 
 
-### patient add
+### 👨🏻‍🦳 Add a patient
 ```
-curl -X POST -H "Content-Type: application/json" -d @patient.json http://172.20.0.2:8080/v1/store -i
+curl -X POST -H "Content-Type: application/json" -d @patient.json http://172.20.0.2:8080/v1/patient -i
 ```
-- In order to add a new user do a POST request in `/v1/store` with a body contains JSON like this.
+- In order to add a new user do a POST request in `/v1/patient` with a body contains JSON like this.
 ```
 {
   "payload": {
@@ -231,11 +245,11 @@ Connection: Keep-Alive
 }%
 ```
 
-### patient get
+### 🤓 Get a patient
 ```
-curl -X GET -H "Content-Type: application/json" -d @get_patient.json http://172.20.0.2:8080/v1/retrieve -i
+curl -X GET -H "Content-Type: application/json" -d @get_patient.json http://172.20.0.2:8080/v1/patient -i
 ```
-- do a GET request on `/v1/retrieve` with a body contains a JSON with following data
+- do a GET request on `/v1/patient` with a body contains a JSON with following data
 ```
 {
   "id": 100015,
@@ -305,13 +319,13 @@ Connection: Keep-Alive
 - the username should be valid.
 - the 'id' is the patient_id and should exists
 
-### patient update
+### 👍🏻 patient update
  - WIP
-### patient delete
+### ❌ Delete a patient
   ```
-  curl -X DELETE -H "Content-Type: application/json" -d @del_patient.json http://172.20.0.2:8080/v1/store -i
+  curl -X DELETE -H "Content-Type: application/json" -d @del_patient.json http://172.20.0.2:8080/v1/patient -i
   ```
-  - In order to delete a patient do a DELETE request in `/v1/store` with a body contains JSON like this.
+  - In order to delete a patient do a DELETE request in `/v1/patient` with a body contains JSON like this.
   ```
   {
   "payload": {
@@ -384,5 +398,5 @@ Connection: Keep-Alive
 ```
 
 
-### patient search
+### 🔎  Search
  - WIP
