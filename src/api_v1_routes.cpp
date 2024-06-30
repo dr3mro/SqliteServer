@@ -45,6 +45,12 @@ API_V1_Routes::API_V1_Routes(crow::SimpleApp& app, UserController& userControlle
             // list of results as json .. it will be expensive
         });
 
+    CROW_ROUTE(app, "/v1/hello")
+        .methods("GET"_method)([](const crow::request& req, crow::response& res) {
+            res.code = crow::OK;
+            res.end("Welcome to ASGARD.");
+        });
+
     CROW_CATCHALL_ROUTE(app)
     ([](crow::response& res) {
         res.code = crow::NOT_FOUND;
