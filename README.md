@@ -308,6 +308,81 @@ Connection: Keep-Alive
 ### patient update
  - WIP
 ### patient delete
- - WIP
+  ```
+  curl -X DELETE -H "Content-Type: application/json" -d @del_patient.json http://172.20.0.2:8080/v1/store -i
+  ```
+  - In order to delete a patient do a DELETE request in `/v1/store` with a body contains JSON like this.
+  ```
+  {
+  "payload": {
+    "basic_data": {
+      "id": 100032,
+      "firstname": "John",
+      "lastname": "Doe",
+      "date_of_birth": "1990-01-01",
+      "gender": "Male"
+    }
+  },
+  "sha256sum": "eb0ba7887fec5a0e369ae9cb56155ec9b0e13935af64a1af6adae31777e83951",
+  "username": "amr_nasr",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MTk3NTE0OTksImlhdCI6MTcxOTc1MDU5OSwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.7i5QUrKpSX1sMlN6KVQZfiPzpT0CCHa7Uk2Gsy3J79w"
+}
+```
+- data should be correct as any wrong info will invalidate the request.
+- sha256sum is needed to prevent malicious mass deletion of data.
+- a valid token must be provided.
+- a successful delete reply with a json like this
+```
+HTTP/1.1 200 OK
+Content-Length: 133
+Server: ProjectValhalla
+Date: Sun, 30 Jun 2024 12:33:40 GMT
+Connection: Keep-Alive
+
+{
+    "response": [
+        {
+            "affected rows": 1
+        }
+    ],
+    "status id": 0,
+    "status message": "success"
+}%
+```
+- a failed delete request will reply with
+```
+HTTP/1.1 200 OK
+Content-Length: 134
+Server: ProjectValhalla
+Date: Sun, 30 Jun 2024 12:34:23 GMT
+Connection: Keep-Alive
+
+{
+    "response": [
+        {
+            "affected rows": 0
+        }
+    ],
+    "status id": -1,
+    "status message": "failure"
+}%
+```
+- notice that the http return code is `200` indicating it did reach the database but found no identical entry. it the data cannot get to the database due any other error the return code would be `400` like for example token invalidation or expiration.
+
+```
+HTTP/1.1 400 Bad Request
+Content-Length: 134
+Server: ProjectValhalla
+Date: Sun, 30 Jun 2024 12:29:44 GMT
+Connection: Keep-Alive
+
+{
+    "response": "authentication token invalid or expired",
+    "status id": -1,
+    "status message": "failed to delete patient"
+}%
+```
+
+
 ### patient search
  - WIP

@@ -2,7 +2,7 @@
 
 #define ISSUER "ProjectValhalla"
 #define TYPE "JWS"
-#define VALIDITY 15
+#define VALIDITY 60
 #define SECRET "01234567890123456789012345678901"
 // Function to generate JWT token
 std::string Tokenizer::generate_token(const std::string& username)

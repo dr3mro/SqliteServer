@@ -59,6 +59,7 @@ bool RestHelper::is_request_data_valid(const crow::request& req, crow::response&
     // Try to parse json and throw error if invalid json and if parsed check integreity by claculating sha256
     try {
         data_json = json::parse(req.body);
+        std::cout << data_json.to_string() << std::endl;
 
         if (!data_json.contains("sha256sum")) {
             return false;
@@ -69,7 +70,7 @@ bool RestHelper::is_request_data_valid(const crow::request& req, crow::response&
 
         std::string sha256sum = data_json["sha256sum"].as<std::string>();
         std::string payload = data_json["payload"].as<std::string>();
-        // std::cout << picosha2::hash256_hex_string(payload) << std::endl;
+        std::cout << picosha2::hash256_hex_string(payload) << std::endl;
         if (sha256sum == picosha2::hash256_hex_string(payload)) {
             return true;
         }

@@ -143,14 +143,37 @@ void PatientController::update_patient_basic_information(const crow::request& re
         rHelper.finish_response(res, 500, response_json);
     }
 }
-void PatientController::delete_patient_basic_information(const crow::request& req, crow::response& res, uint64_t id)
+void PatientController::delete_patient(const crow::request& req, crow::response& res)
 {
 
     json response_json;
 
     try {
+        // Data Integrity check
+        json data_json;
+        if (!rHelper.is_request_data_valid(req, res, response_json, data_json)) {
+            rHelper.respond_with_error(res, response_json, "failed to delete patient", "payload integrity check failed", -1, 400);
+            return;
+        }
+
+        // User authentication check
+        std::string username = data_json["username"].as<std::string>();
+        std::string token = data_json["token"].as<std::string>();
+
+        if (!tokenizer.token_validator(token, username)) {
+            rHelper.respond_with_error(res, response_json, "failed to delete patient", "authentication token invalid or expired", -1, 400);
+            return;
+        }
+
+        json basic_data_json = data_json["payload"]["basic_data"];
+        uint64_t user_id = basic_data_json["id"].as<uint64_t>();
+        std::string basic_data = basic_data_json.to_string();
+
         // Construct SQL query using {fmt} for parameterized query
-        std::string query = fmt::format("DELETE FROM patients_basic_data WHERE id={};", id);
+        std::string query
+            = fmt::format("DELETE FROM patients where id={} and basic_data @> '{}';", user_id, basic_data);
+
+        std::cout << query << std::endl;
 
         // Execute the query using DatabaseHandler
         json query_results_json = dbController.executeQuery(query);
