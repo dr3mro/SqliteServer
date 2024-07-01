@@ -65,7 +65,7 @@ Date: Sat, 29 Jun 2024 13:38:55 GMT
 Connection: Keep-Alive
 
 {
-    "response": [
+    "payload": [
         {
             "affected rows": 1
         }
@@ -84,7 +84,7 @@ Date: Sat, 29 Jun 2024 13:36:13 GMT
 Connection: Keep-Alive
 
 {
-    "response": "User already exists",
+    "payload": "User already exists",
     "status id": -1,
     "status message": "Failed to create a new user, user exists"
 }%
@@ -118,7 +118,7 @@ Date: Sat, 29 Jun 2024 21:44:00 GMT
 Connection: Keep-Alive
 
 {
-    "response": {
+    "payload": {
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MTk2OTgzNDAsImlhdCI6MTcxOTY5NzQ0MCwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.2TOQNIIk-0gDxCSpNpHxVZOeN1u503viTHt8ezbcYDI"
     },
     "status id": 0,
@@ -135,7 +135,7 @@ Date: Sat, 29 Jun 2024 21:46:18 GMT
 Connection: Keep-Alive
 
 {
-    "response": "User 'amr_nasrm' not found or wrong password",
+    "payload": "User 'amr_nasrm' not found or wrong password",
     "status id": -1,
     "status message": "Login Failure"
 }%
@@ -197,7 +197,7 @@ Date: Sat, 29 Jun 2024 21:49:37 GMT
 Connection: Keep-Alive
 
 {
-    "response": [
+    "payload": [
         {
             "affected rows": 1
         },
@@ -239,7 +239,7 @@ Date: Sat, 29 Jun 2024 13:49:52 GMT
 Connection: Keep-Alive
 
 {
-    "response": "authentication token invalidated",
+    "payload": "authentication token invalidated",
     "status id": -1,
     "status message": "failed to create a new patient"
 }%
@@ -271,7 +271,7 @@ Date: Sat, 29 Jun 2024 13:53:05 GMT
 Connection: Keep-Alive
 
 {
-    "response": [
+    "payload": [
         {
             "appointments_data": {},
             "basic_data": {
@@ -308,7 +308,7 @@ Date: Sat, 29 Jun 2024 13:52:36 GMT
 Connection: Keep-Alive
 
 {
-    "response": "token is invalidated",
+    "payload": "token is invalidated",
     "status id": -1,
     "status message": "failed to retrieve patient"
 }%
@@ -364,7 +364,7 @@ Date: Sun, 30 Jun 2024 19:47:04 GMT
 Connection: Keep-Alive
 
 {
-    "response": [
+    "payload": [
         {
             "affected rows": 1
         }
@@ -382,7 +382,7 @@ Date: Sun, 30 Jun 2024 19:52:33 GMT
 Connection: Keep-Alive
 
 {
-    "response": [
+    "payload": [
         {
             "affected rows": 0
         }
@@ -426,7 +426,7 @@ Date: Sun, 30 Jun 2024 12:33:40 GMT
 Connection: Keep-Alive
 
 {
-    "response": [
+    "payload": [
         {
             "affected rows": 1
         }
@@ -444,7 +444,7 @@ Date: Sun, 30 Jun 2024 12:34:23 GMT
 Connection: Keep-Alive
 
 {
-    "response": [
+    "payload": [
         {
             "affected rows": 0
         }
@@ -463,7 +463,7 @@ Date: Sun, 30 Jun 2024 12:29:44 GMT
 Connection: Keep-Alive
 
 {
-    "response": "authentication token invalid or expired",
+    "payload": "authentication token invalid or expired",
     "status id": -1,
     "status message": "failed to delete patient"
 }%
@@ -471,4 +471,112 @@ Connection: Keep-Alive
 
 
 ### 🔎  Search
- - WIP
+```
+curl -X SEARCH -H "Content-Type: application/json" -d @search.json http://172.20.0.2:8080/v1/patient -i
+```
+ - In order to search for a patient do a SEARCH request in `/v1/patient` with a body contains JSON like this.
+
+```
+{
+    "keyword" : "John",
+    "limit" : 5,
+    "offset" : 0,
+    "order_by" : "id",
+    "direction" : 0,
+    "username" : "amr_nasr",
+    "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE3MjI0MjcwMDAsImlhdCI6MTcxOTgzNTAwMCwiaXNzIjoiUHJvamVjdFZhbGhhbGxhIiwic3ViIjoiYW1yX25hc3IifQ.i3IOtMR1tKpP86uMsnmCoU1227PxYnFB0z7aXXPyZts"
+}
+```
+ - explanation:
+
+    * keyword: the text to search for in basic data
+    * limit: maximum number of returned results
+    * offset : start with 0 and keep it to send it in the next request to get the next patch
+    * order_by : name of json key to sort by
+    * direction : ascending = 0 , descending = 1
+    * user_name : of the user that is requesting the search
+    * toke : the valid token
+
+- a reply would look like this
+```
+HTTP/1.1 200 OK
+Content-Length: 2034
+Server: ProjectValhalla
+Date: Mon, 01 Jul 2024 13:23:47 GMT
+Connection: Keep-Alive
+
+{
+    "more": true,
+    "offset": 3,
+    "payload": [
+        {
+            "basic_data": {
+                "address": "123 Main St, Anytown, USA",
+                "contact": [
+                    {
+                        "email": "john.doe@example.com"
+                    },
+                    {
+                        "phone": "+1987654321"
+                    }
+                ],
+                "date_of_birth": "1990-01-01",
+                "firstname": "John",
+                "gender": "Male",
+                "id": 100009,
+                "lastname": "Doe",
+                "occupation": "Engineer",
+                "place_of_birth": "New York"
+            }
+        },
+        {
+            "basic_data": {
+                "address": "123 Main St, Anytown, USA",
+                "contact": [
+                    {
+                        "email": "john.doe@example.com"
+                    },
+                    {
+                        "phone": "+1987654321"
+                    }
+                ],
+                "date_of_birth": "1990-01-01",
+                "firstname": "John",
+                "gender": "Male",
+                "id": 100008,
+                "lastname": "Doe",
+                "occupation": "Engineer",
+                "place_of_birth": "New York"
+            }
+        },
+        {
+            "basic_data": {
+                "address": "123 Main St, Anytown, USA",
+                "contact": [
+                    {
+                        "email": "john.doe@example.com"
+                    },
+                    {
+                        "phone": "+1987654321"
+                    }
+                ],
+                "date_of_birth": "1990-01-01",
+                "firstname": "John",
+                "gender": "Male",
+                "id": 100007,
+                "lastname": "Doe",
+                "occupation": "Engineer",
+                "place_of_birth": "New York"
+            }
+        }
+    ],
+    "status id": 0,
+    "status message": "success"
+}%
+```
+
+- check the `more` key to see if there is any more results
+- keep the `offset` to use it with the next request.
+
+🥳🥳🥳🥳🎉🎉🎉🎉
+

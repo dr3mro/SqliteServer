@@ -42,7 +42,7 @@ void RestHelper::format_response(json& response_json, const short status, const 
 {
     response_json["status id"] = status;
     response_json["status message"] = status_message;
-    response_json["response"] = response;
+    response_json["payload"] = response;
 }
 
 void RestHelper::finish_response(crow::response& res, const int& code, const json& response_json)
