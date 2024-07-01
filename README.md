@@ -495,7 +495,7 @@ curl -X SEARCH -H "Content-Type: application/json" -d @search.json http://172.20
     * order_by : name of json key to sort by
     * direction : ascending = 0 , descending = 1
     * user_name : of the user that is requesting the search
-    * toke : the valid token
+    * token : the valid token
 
 - a reply would look like this
 ```

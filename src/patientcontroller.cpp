@@ -223,8 +223,22 @@ void PatientController::search_patient(const crow::request& req, crow::response&
             return;
         }
 
-        if (!req_json.contains("token")) {
-            rHelper.respond_with_error(res, response_json, "failed to execute search", "token is not found", -1, 400);
+        if (!req_json.contains("order_by")) {
+            rHelper.respond_with_error(res, response_json, "failed to execute search", "order_by is not found", -1, 400);
+            return;
+        }
+        if (!req_json.contains("direction")) {
+            rHelper.respond_with_error(res, response_json, "failed to execute search", "direction is not found", -1, 400);
+            return;
+        }
+
+        if (!req_json.contains("limit")) {
+            rHelper.respond_with_error(res, response_json, "failed to execute search", "limit is not found", -1, 400);
+            return;
+        }
+
+        if (!req_json.contains("offset")) {
+            rHelper.respond_with_error(res, response_json, "failed to execute search", "offset is not found", -1, 400);
             return;
         }
 
@@ -232,16 +246,18 @@ void PatientController::search_patient(const crow::request& req, crow::response&
             rHelper.respond_with_error(res, response_json, "failed to execute search", "username is not found", -1, 400);
             return;
         }
+        if (!req_json.contains("token")) {
+            rHelper.respond_with_error(res, response_json, "failed to execute search", "token is not found", -1, 400);
+            return;
+        }
 
-        std::string token = req_json["token"].as<std::string>();
-        std::string username = req_json["username"].as<std::string>();
         std::string keyword = req_json["keyword"].as<std::string>();
-        std::string direction = req_json["direction"].as<short>() == 0 ? "ASC" : "DESC";
         std::string order_by = req_json["order_by"].as<std::string>();
-
-        size_t limit
-            = req_json["limit"].as<size_t>();
+        std::string direction = req_json["direction"].as<short>() == 0 ? "ASC" : "DESC";
+        size_t limit = req_json["limit"].as<size_t>();
         size_t offset = req_json["offset"].as<size_t>();
+        std::string username = req_json["username"].as<std::string>();
+        std::string token = req_json["token"].as<std::string>();
 
         if (!tokenizer.token_validator(token, username)) {
             rHelper.respond_with_error(res, response_json, "failed to execute search", "token is invalidated", -1, 400);
@@ -254,7 +270,6 @@ void PatientController::search_patient(const crow::request& req, crow::response&
         json query_results_json = dbController.executeReadQuery(query);
 
         size_t results_count = query_results_json.size();
-        // std::cout << query_results_json.as<std::string>();
 
         if (results_count > limit) {
             response_json["more"] = true;
